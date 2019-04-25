@@ -8,6 +8,9 @@ from snake import Direction
 from player import Player
 from player_ai import PlayerAI
 
+# breno viadaoooo
+
+
 
 class Game:
     def __init__(self, screen_size=20, delay=200, box_width=20, human_player=True):
