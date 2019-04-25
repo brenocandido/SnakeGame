@@ -23,16 +23,26 @@ class Node:
 
         return None
 
-    def get_available_nodes(self):
+    def get_available_nodes(self, move_list):
         nodes = []
+        closed_list_positions = self.get_node_positions(self.closed_list)
+        move_list_positions = self.get_node_positions(move_list)
         for node in self.open_list:
-            if node not in self.closed_list:
+            if node.position not in closed_list_positions and node.position not in move_list_positions:
                 nodes.append(node)
 
         return nodes
 
-    def get_lowest_f(self):
-        available_list = self.get_available_nodes()
+    @staticmethod
+    def get_node_positions(node_list):
+        node_positions = []
+        for node in node_list:
+            node_positions.append(node.position)
+
+        return node_positions
+
+    def get_lowest_f(self, move_list):
+        available_list = self.get_available_nodes(move_list)
         if len(available_list) == 0:
             return None
 

@@ -5,7 +5,7 @@ from graph import Graph, Node
 
 class PlayerAI(AbstractPlayer):
 
-    def __init__(self, snake, food, score, box):
+    def __init__(self, snake, food, score, box, max_return_tries=300):
         self.snake = snake
         self.food = food
         self.score = score
@@ -14,8 +14,11 @@ class PlayerAI(AbstractPlayer):
         self.closed_list = []
         self.obstacle_list = []
         self.move_list = []
+        self.full_move_list = []
         self.graph = Graph(Node(self.head_position(), 0))
         self.current_node = self.graph.root
+        self.return_tries = 0
+        self.max_return_tries = max_return_tries
 
     def get_move(self):
         return self.get_a_star_move()
@@ -24,30 +27,36 @@ class PlayerAI(AbstractPlayer):
         self.reset_lists()
         self.obstacle_list = self.get_obstacle_list()
         self.get_move_list()
-        return self.get_direction(self.head_position(), self.move_list[0].position)
+        move = self.move_list[0].position if len(self.move_list) != 0 else self.head_position()
+        return self.get_direction(self.head_position(), move)
 
     def reset_lists(self):
         self.open_list = []
         self.closed_list = []
         self.obstacle_list = []
         self.move_list = []
+        self.full_move_list = []
 
     def get_move_list(self):  # TODO test if current F is the lowest of the graph
         self.current_node = Node(self.head_position(),0)
+        self.return_tries = 0
+        self.full_move_list = []
 
-        while not self.objective_reached(self.current_node.position, self.objective_position()):
+        while not self.objective_reached(self.current_node.position, self.objective_position()) and self.return_tries <= self.max_return_tries:
 
             self.current_node.add_open_list(self.get_open_list(self.current_node.position))
-            closed_node = self.current_node.get_lowest_f()
-            closed_node.add_closed_node(self.current_node)
+            closed_node = self.current_node.get_lowest_f(self.full_move_list)
 
             if not (closed_node is None):
+                closed_node.add_closed_node(self.current_node)
                 self.current_node.add_closed_node(closed_node)
                 self.move_list.append(closed_node)
+                self.full_move_list.append(closed_node)
                 self.current_node = closed_node
 
             else:  # No node returned
                 self.return_to_previous_node()
+                self.return_tries += 1
 
     def get_open_list(self, position):
         neighbours = [(0, -1), (1, 0), (0, 1), (-1, 0)]
@@ -73,13 +82,13 @@ class PlayerAI(AbstractPlayer):
             pass
 
         else:
-            if len(self.move_list - 1) == 0:
+            if len(self.move_list)-1 == 0:
                 self.current_node = self.graph.root
 
             else:
                 self.current_node = self.move_list[len(self.move_list) - 1]
 
-            del self.move_list[len(self.move_list)]
+            del self.move_list[len(self.move_list)-1]
 
     def head_position(self):
         return self.snake.head().position
@@ -149,9 +158,7 @@ class PlayerAI(AbstractPlayer):
         return direction
 
     def reset(self):
-        self.open_list = []
-        self.obstacle_list = []
-        self.closed_list = []
-        self.move_list = []
+        self.reset_lists()
         self.graph = Graph(Node(self.head_position(), 0))
         self.current_node = self.graph.root
+        self.return_tries = 0
