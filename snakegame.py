@@ -99,7 +99,7 @@ class Game:
 
     def spawn_food(self):
         food = Food(self.game_box.get_unoccupied_list())
-        self.game_box.set_occupied(food.position, True, item=Food)
+        self.game_box.set_item(food.position, Food)
         return food
 
     def is_on_food(self):
@@ -157,11 +157,6 @@ class Game:
         y2 = self.__box_width__
         pygame.draw.rect(self.screen, self.__food_color__, [x1, y1, x2, y2])
 
-    #def __get_game_position__(self, position):
-     #  return (position[0]//self.__box_width__, position[1]//self.__box_width__)
-
-    #def screen_position(self, position):
-     #   return (position[0]*self.__box_width__, position[1]*self.__box_width__)
 
     def reset(self):
         self.game_box.reset()
@@ -172,5 +167,5 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=30, delay=200, human_player=True)
+game = Game(screen_size=30, delay=300, human_player=True)
 game.run()

@@ -15,7 +15,5 @@ class PlayerAI(AbstractPlayer):
         print(self.snake.direction.name)
         return Direction.none
 
-    def head_po
-
     def reset(self):
         pass

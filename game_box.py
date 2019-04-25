@@ -10,11 +10,8 @@ class Item(Enum):
 
 class Field:
     def __init__(self, item=Item.empty):
-        self.occupied = False
         self.item = item
 
-    def set_occupied(self, boolean):
-        self.occupied = boolean
 
     def set_item(self, item):
         self.item = item
@@ -27,30 +24,21 @@ class GameBox:
         self.side_size = side_size
 
     def is_occupied(self, position):
-        return self.box[position[0]][position[1]].occupied
-
-    def set_occupied(self, position, boolean, item=Item.empty):
-        if not boolean: # Removing from position
-            self.set_item(position, Item.empty)
-
-        else: # Adding item
-            self.set_item(position, item)
-
-        self.box[position[0]][position[1]].set_occupied(boolean)
+        return self.box[position[1]][position[0]].item != Item.empty
 
     def set_item(self, position, item):
-        self.box[position[0]][position[1]].set_item(item)
+        self.box[position[1]][position[0]].set_item(item)
 
     def get_unoccupied_list(self):
         unoccupied_list = []
         for i in range(self.side_size):
             for j in range(self.side_size):
                 if not self.is_occupied((i, j)):
-                    unoccupied_list.append((i, j))
+                    unoccupied_list.append((j, i))
 
         return unoccupied_list
 
     def reset(self):
         for i in range(self.side_size):
             for j in range(self.side_size):
-                self.box[i][j].set_occupied(False)
+                self.box[i][j].set_item(Item.empty)

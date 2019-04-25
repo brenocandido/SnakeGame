@@ -40,9 +40,9 @@ class Snake:
 
     def initial_spawn(self, position):
         self.body.append(Body(position))
-        self.box.set_occupied(position, True, item=Item.head)
+        self.box.set_item(position, Item.head)
         self.body.append(Body((position[0],position[1]+1)))
-        self.box.set_occupied(position, True, item=Item.body)
+        self.box.set_item(position, Item.body)
 
     def head(self):
         return self.body[len(self.body) - 1]
@@ -75,11 +75,11 @@ class Snake:
 
     def move_head(self, position):
         self.body.append(Body(position))
-        self.box.set_occupied(position, True, item=Item.head)
-        self.box.set_item(self.body_following_head().position, item=Item.body)
+        self.box.set_item(position, Item.head)
+        self.box.set_item(self.body_following_head().position, Item.body)
 
     def decrease_size(self):
-        self.box.set_occupied(self.body[0].position, False)
+        self.box.set_item(self.body[0].position, Item.empty)
         del self.body[0]
 
     def reset(self):
