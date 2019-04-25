@@ -30,7 +30,8 @@ class Body:
 
 class Snake:
     def __init__(self, position, box):
-        self.direction = Direction.up
+        self.__initial_direction__ = Direction.down
+        self.direction = self.__initial_direction__
         self.state = State.idle
         self.body = []
         self.box = box
@@ -41,8 +42,9 @@ class Snake:
     def initial_spawn(self, position):
         self.body.append(Body(position))
         self.box.set_item(position, Item.head)
-        self.body.append(Body((position[0],position[1]+1)))
-        self.box.set_item(position, Item.body)
+        body_position = (position[0],position[1]+1)
+        self.body.append(Body(body_position))
+        self.box.set_item(body_position, Item.body)
 
     def head(self):
         return self.body[len(self.body) - 1]
@@ -84,7 +86,7 @@ class Snake:
 
     def reset(self):
         self.state = State.idle
-        self.direction = Direction.up
+        self.direction = self.__initial_direction__
         self.body = []
         self.initial_spawn(self.__starting_position__)
         self.size_up = False

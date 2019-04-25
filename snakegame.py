@@ -10,13 +10,14 @@ from player_ai import PlayerAI
 
 class Game:
     def __init__(self, screen_size=20, delay=200, box_width=20, human_player=True):
+        self.is_running = False
+        self.human_player = human_player
         self.__screen_size__ = screen_size
         self.__box_width__ = box_width
         self.__hit__ = False
         self.game_box = game_box.GameBox(screen_size)
         screen_width = screen_size * box_width
         pygame.init()
-        self.is_running = True
         self.screen = pygame.display.set_mode([screen_width, screen_width])
         self.snake = self.spawn_snake((screen_size//2, screen_size//2), self.game_box)
         self.food = self.spawn_food()
@@ -27,6 +28,7 @@ class Game:
         self.__screen_color__ = [255, 255, 255]
         self.__food_color__ = [255, 0, 0]
         self.__delay__ = delay
+        self.is_running = True
 
     def spawn_snake(self, position, game_box):
         _snake = snake.Snake(position, game_box)
@@ -100,6 +102,8 @@ class Game:
     def spawn_food(self):
         food = Food(self.game_box.get_unoccupied_list())
         self.game_box.set_item(food.position, Food)
+        if self.is_running and not self.human_player:
+            self.player.update_food(food)
         return food
 
     def is_on_food(self):
@@ -167,5 +171,5 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=30, delay=40, human_player=True)
+game = Game(screen_size=30, delay=1, human_player=False)
 game.run()

@@ -41,6 +41,12 @@ class GameBox:
 
         return unoccupied_list
 
+    def is_obstacle(self, position):
+        if self.box[position[1]][position[0]].item == Item.body:
+            return True
+
+        return False
+
     def reset(self):
         for i in range(self.side_size):
             for j in range(self.side_size):

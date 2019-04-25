@@ -51,3 +51,6 @@ class Player(AbstractPlayer):
 
     def reset(self):
         pygame.event.clear()
+
+    def update_food(self):
+        pass
