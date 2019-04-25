@@ -26,7 +26,7 @@ class Node:
     def get_available_nodes(self):
         nodes = []
         for node in self.open_list:
-            if not(node in self.closed_list):
+            if node not in self.closed_list:
                 nodes.append(node)
 
         return nodes

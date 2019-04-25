@@ -21,16 +21,25 @@ class PlayerAI(AbstractPlayer):
         return self.get_a_star_move()
 
     def get_a_star_move(self):
+        self.reset_lists()
         self.obstacle_list = self.get_obstacle_list()
         self.get_move_list()
         return self.get_direction(self.head_position(), self.move_list[0].position)
 
+    def reset_lists(self):
+        self.open_list = []
+        self.closed_list = []
+        self.obstacle_list = []
+        self.move_list = []
+
     def get_move_list(self):  # TODO test if current F is the lowest of the graph
+        self.current_node = Node(self.head_position(),0)
 
         while not self.objective_reached(self.current_node.position, self.objective_position()):
 
             self.current_node.add_open_list(self.get_open_list(self.current_node.position))
             closed_node = self.current_node.get_lowest_f()
+            closed_node.add_closed_node(self.current_node)
 
             if not (closed_node is None):
                 self.current_node.add_closed_node(closed_node)
