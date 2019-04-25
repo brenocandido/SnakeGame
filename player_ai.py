@@ -1,0 +1,21 @@
+from abstract_player import AbstractPlayer
+from snake import Direction
+
+
+class PlayerAI(AbstractPlayer):
+
+    def __init__(self, snake, food, score, box):
+        self.snake = snake
+        self.food = food
+        self.score = score
+        self.box = box
+
+    def get_move(self):
+        print(self.snake.head().position)
+        print(self.snake.direction.name)
+        return Direction.none
+
+    def head_po
+
+    def reset(self):
+        pass
