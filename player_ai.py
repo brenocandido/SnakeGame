@@ -13,8 +13,9 @@ class PlayerAI(AbstractPlayer):
         self.box = box
 
     def get_move(self):
-        print(self.snake.head().position)
-        print(self.snake.direction.name)
+        move = self.get_move_a_star(self.box,self.box.size,self.box.size)
+        #self.encontraPosicoes(self.box,self.box.size,self.box.size,)move[0]
+        #moce[1]
         return Direction.none
 
     def reset(self):
