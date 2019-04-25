@@ -8,13 +8,13 @@ class Node:
         self.open_list = []
         self.closed_list = []
 
-    def add_edge(self, node):
+    def add_open_node(self, node):
         self.open_list.append(node)
 
     def add_open_list(self, open_list):
         self.open_list = open_list
 
-    def add_closed_edge(self, node):
+    def add_closed_node(self, node):
         self.closed_list.append(node)
 
     def get_path(self):
@@ -23,20 +23,21 @@ class Node:
 
         return None
 
-    def get_available_edges(self):
-        edges = []
-        for edge in self.open_list:
-            if not(edge in self.closed_list):
-                edges.append(edge)
+    def get_available_nodes(self):
+        nodes = []
+        for node in self.open_list:
+            if not(node in self.closed_list):
+                nodes.append(node)
 
-        return edges
+        return nodes
 
     def get_lowest_f(self):
-        if len(self.open_list) == 0:
+        available_list = self.get_available_nodes()
+        if len(available_list) == 0:
             return None
 
-        edge = self.open_list[0]
-        for new_edge in self.open_list:
+        edge = available_list[0]
+        for new_edge in available_list:
             if new_edge.f < edge.f:
                 edge = new_edge
 
