@@ -88,4 +88,3 @@ class Snake:
         self.body = []
         self.initial_spawn(self.__starting_position__)
         self.size_up = False
-        # peteck viado

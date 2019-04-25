@@ -2,14 +2,10 @@ import pygame
 import snake
 from food import Food
 import game_box
-from game_box import Item
 import score
 from snake import Direction
 from player import Player
 from player_ai import PlayerAI
-
-# breno viadaoooo
-
 
 
 class Game:
