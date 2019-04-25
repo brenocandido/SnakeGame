@@ -23,6 +23,9 @@ class GameBox:
         self.box = [[Field() for i in range(side_size)] for j in range(side_size)]
         self.side_size = side_size
 
+    def size(self):
+        return len(self.box)
+
     def is_occupied(self, position):
         return self.box[position[1]][position[0]].item != Item.empty
 
