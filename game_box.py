@@ -27,22 +27,22 @@ class GameBox:
         return len(self.box)
 
     def is_occupied(self, position):
-        return self.box[position[1]][position[0]].item != Item.empty
+        return self.box[position[0]][position[1]].item != Item.empty
 
     def set_item(self, position, item):
-        self.box[position[1]][position[0]].set_item(item)
+        self.box[position[0]][position[1]].set_item(item)
 
     def get_unoccupied_list(self):
         unoccupied_list = []
         for i in range(self.side_size):
             for j in range(self.side_size):
                 if not self.is_occupied((i, j)):
-                    unoccupied_list.append((j, i))
+                    unoccupied_list.append((i, j))
 
         return unoccupied_list
 
     def is_obstacle(self, position):
-        if self.box[position[1]][position[0]].item == Item.body:
+        if self.box[position[0]][position[1]].item == Item.body:
             return True
 
         return False

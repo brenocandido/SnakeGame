@@ -24,10 +24,9 @@ class PlayerAI(AbstractPlayer):
 
     def get_obstacle_list(self):
         obstacle_list = []
-        for j in range(self.box.size()):
-            for i in range(self.box.size()):
-                if self.box.is_obstacle((i, j)):
-                    obstacle_list.append((i, j))
+        for body in self.snake.body:
+            if body != self.snake.head():
+                obstacle_list.append(body.position)
 
         return obstacle_list
 
