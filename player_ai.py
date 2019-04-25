@@ -1,5 +1,6 @@
 from abstract_player import AbstractPlayer
 from snake import Direction
+from graph import Graph, Node
 
 
 class PlayerAI(AbstractPlayer):
@@ -10,7 +11,10 @@ class PlayerAI(AbstractPlayer):
         self.score = score
         self.box = box
         self.open_list = []
+        self.closed_list = []
         self.obstacle_list = []
+        self.graph = Graph(Node(self.head_position(), 0))
+
 
     def get_move(self):
         return self.get_a_star_move()
@@ -50,13 +54,13 @@ class PlayerAI(AbstractPlayer):
         self.open_list = self.get_open_list()
         return self.get_best_move()
 
-    def get_open_list(self):
-        neighbours = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    def get_open_list(self, position):
+        neighbours = [(0, -1), (1, 0), (0, 1), (-1, 0)]
         open_list = []
 
         for n in neighbours:
-            sum = self.sum_tuple(self.head_position(), n)
-            if self.is_in_box(sum) and not sum in self.obstacle_list:
+            sum = self.sum_tuple(position, n)
+            if self.is_in_box(sum) and not (sum in self.obstacle_list):
                 open_list.append(sum)
 
         return open_list
@@ -69,6 +73,14 @@ class PlayerAI(AbstractPlayer):
         h = self.manhattan(start, end)
 
         return g + h
+
+    def get_graph_open_list(self, open_list):
+        graph_list = []
+        for element_position in open_list:
+            f = self.f(element_position, self.objective_position())
+            graph_list.append(Node(element_position, f))
+
+        return graph_list
 
     def get_best_move(self):
         f = 1000000

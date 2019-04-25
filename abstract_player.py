@@ -10,7 +10,3 @@ class AbstractPlayer(ABC):
     @abstractmethod
     def reset(self):
         pass
-
-    @abstractmethod
-    def update_food(self):
-        pass
