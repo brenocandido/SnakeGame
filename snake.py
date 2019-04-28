@@ -55,6 +55,9 @@ class Snake:
     def tail(self):
         return self.body[0]
 
+    def size(self):
+        return len(self.body)
+
     def turn(self, direction):
         if direction != Direction.none:
             self.direction = direction

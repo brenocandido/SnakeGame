@@ -15,18 +15,18 @@ class PlayerAI(AbstractPlayer):
         self.came_from = {}
 
     def get_move(self):
-        return self.get_a_star_move()
+        return self.get_a_star_move(self.head_position(), self.objective_position())
 
-    def get_a_star_move(self):
+    def get_a_star_move(self, start, goal):
+
         self.reset_lists()
         self.obstacle_list = self.get_obstacle_list()
-        self.get_move_list()
-        move = self.get_first_move()
-        return self.get_direction(self.head_position(), move)
+        self.get_move_list(start, goal)
+        move = self.get_first_move(start, goal)
+        return self.get_direction(start, move)
 
-    def get_first_move(self):
-        current = self.objective_position()
-        start = self.head_position()
+    def get_first_move(self, start, goal):
+        current = goal
         move = start
         while current != start:
             try:
@@ -52,10 +52,7 @@ class PlayerAI(AbstractPlayer):
         self.priority_queue = PriorityQueue()
         self.came_from = {}
 
-    def get_move_list(self):
-        count = 0
-        start = self.head_position()
-        goal = self.objective_position()
+    def get_move_list(self, start, goal):
         self.priority_queue.put((0, start))
         self.came_from = {}
         cost_so_far = {}
@@ -78,17 +75,15 @@ class PlayerAI(AbstractPlayer):
                     self.priority_queue.put((priority, next_position))
                     self.came_from[next_position] = current_position
 
-            count += 1
-
     def get_neighbors(self, position, direction_dependant=False, direction=Direction.up):
-        neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+        neighbors = [(1, 0), (0, -1), (-1, 0), (0, 1)]
 
         if direction_dependant:     # Case up included in the initial values
             if direction == Direction.right:
                 neighbors = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
             elif direction == Direction.down:
-                neighbors = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+                neighbors = [(0, 1), (1, 0), (-1, 0), (0, -1)]
 
             elif direction == Direction.left:
                 neighbors = [(0, 1), (-1, 0), (0, -1), (1, 0)]

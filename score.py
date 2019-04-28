@@ -9,6 +9,11 @@ class Score:
         self.move_count = 0
         self.eat_flag = False
 
+        self.total_score = 0
+        self.high_score = 0
+        self.average_score = 0
+        self.total_games = 0
+
     def reset(self):
         self.score = 0
         self.move_count = 0
@@ -30,6 +35,21 @@ class Score:
             self.score = self.score + self.food_value
 
         self.eat_flag = False
+
+    def score_track(self):
+        self.total_games += 1
+
+        self.update_high_score()
+        self.calculate_average_score()
+
+    def update_high_score(self):
+        if self.score > self.high_score:
+            self.high_score = self.score
+
+    def calculate_average_score(self):
+        self.total_score += self.score
+        self.average_score = self.total_score//self.total_games
+
 
     def refresh(self):
         self.move_increment()

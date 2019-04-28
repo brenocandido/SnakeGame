@@ -9,26 +9,36 @@ from player_ai import PlayerAI
 
 
 class Game:
-    def __init__(self, screen_size=20, delay=200, box_width=20, human_player=True):
+    def __init__(self, screen_size=20, delay=200, box_width=20, human_player=True, score_tracking=False):
         self.is_running = False
-        self.human_player = human_player
+
         self.__screen_size__ = screen_size
         self.__box_width__ = box_width
         self.__hit__ = False
-        self.game_box = game_box.GameBox(screen_size)
+
         screen_width = screen_size * box_width
         pygame.init()
+        self.clock = pygame.time.Clock()
+
+        self.score_tracking = score_tracking
+        self.score = score.Score(food_value=10, moves_to_decrement=10, score_decrement=1)
+
+        self.game_box = game_box.GameBox(screen_size)
         self.screen = pygame.display.set_mode([screen_width, screen_width])
         self.snake = self.spawn_snake((screen_size//2, screen_size//2), self.game_box)
         self.food = self.spawn_food()
-        self.clock = pygame.time.Clock()
-        self.score = score.Score(food_value=10, moves_to_decrement=20, score_decrement=1)
         self.player = Player() if human_player else PlayerAI(self.snake, self.food, self.score, self.game_box)
+        self.human_player = human_player
+
+        self.__delay__ = delay
+        self.is_running = True
+
         self.__snake_color__ = [0, 0, 0]
         self.__screen_color__ = [255, 255, 255]
         self.__food_color__ = [255, 0, 0]
-        self.__delay__ = delay
-        self.is_running = True
+
+        # Size tracking
+        self.total_size = 0
 
     def spawn_snake(self, position, game_box):
         _snake = snake.Snake(position, game_box)
@@ -89,7 +99,11 @@ class Game:
                     self.snake.size_up = False
 
             else:
-                self.snake.kill()
+                self.snake_death()
+
+    def snake_death(self):
+        self.snake.kill()
+        if self.score_tracking: self.score_track()
 
     def eat_food(self):
         self.snake_ate()
@@ -161,6 +175,21 @@ class Game:
         y2 = self.__box_width__
         pygame.draw.rect(self.screen, self.__food_color__, [x1, y1, x2, y2])
 
+    def score_track(self):
+        self.score.score_track()
+
+        print("\n----------------------------------",
+              "\nGame:", self.score.total_games,
+              "\nScore:", self.score.score,
+              "\nHigh score:", self.score.high_score,
+              "\nAverage score:", self.score.average_score,
+              "\nSnake size:", self.snake.size(),
+              "\nAverage size:", self.average_size(),
+              "\n----------------------------------\n")
+
+    def average_size(self):
+        self.total_size += self.snake.size()
+        return self.total_size//self.score.total_games
 
     def reset(self):
         self.game_box.reset()
@@ -171,5 +200,5 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=20, delay=0, human_player=False)
+game = Game(screen_size=25, delay=0, human_player=False, score_tracking=True)
 game.run()
