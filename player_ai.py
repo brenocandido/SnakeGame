@@ -85,13 +85,13 @@ class PlayerAI(AbstractPlayer):
 
         if direction_dependant:     # Case up included in the initial values
             if direction == Direction.right:
-                neighbors = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+                neighbors = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
             elif direction == Direction.down:
-                neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+                neighbors = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
             elif direction == Direction.left:
-                neighbors = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+                neighbors = [(0, 1), (-1, 0), (0, -1), (1, 0)]
 
         neighbors_list = []
 
