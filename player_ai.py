@@ -32,7 +32,7 @@ class PlayerAI(AbstractPlayer):
             try:
                 move = current
                 current = self.came_from[current]
-            except:
+            except:     # No path to food possible
                 break
 
         return move

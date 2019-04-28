@@ -171,5 +171,5 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=25, delay=5, human_player=False)
+game = Game(screen_size=25, delay=10, human_player=False)
 game.run()
