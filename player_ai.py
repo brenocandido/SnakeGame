@@ -39,7 +39,7 @@ class PlayerAI(AbstractPlayer):
         return move
 
     def survive(self):
-        neighbors = self.get_neighbors(self.head_position())
+        neighbors = self.get_neighbors(self.head_position(), direction_dependant=True, direction=self.snake.direction)
         move = self.head_position()
 
         if neighbors:       # If not empty
@@ -80,8 +80,13 @@ class PlayerAI(AbstractPlayer):
 
             count += 1
 
-    def get_neighbors(self, position):
+    def get_neighbors(self, position, direction_dependant=False, direction=Direction.up):
         neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        if direction_dependant:
+            if direction == Direction.right or direction == Direction.left:
+                neighbors = [(0, -1), (0, 1), (-1, 0), (1, 0)]          # Case up or down is included in the initial value
+
         neighbors_list = []
 
         for n in neighbors:
