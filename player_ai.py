@@ -1,11 +1,13 @@
 from abstract_player import AbstractPlayer
 from snake import Direction
 from graph import Graph, Node
+from queue import PriorityQueue
 
 
 class PlayerAI(AbstractPlayer):
 
     def __init__(self, snake, food, score, box, max_return_tries=300):
+        self.priority_queue = PriorityQueue()
         self.snake = snake
         self.food = food
         self.score = score
@@ -15,6 +17,8 @@ class PlayerAI(AbstractPlayer):
         self.obstacle_list = []
         self.move_list = []
         self.full_move_list = []
+        self.blocked_list = []          # List of nodes with dead ends
+        self.came_from = {}
         self.graph = Graph(Node(self.head_position(), 0))
         self.current_node = self.graph.root
         self.return_tries = 0
@@ -27,8 +31,21 @@ class PlayerAI(AbstractPlayer):
         self.reset_lists()
         self.obstacle_list = self.get_obstacle_list()
         self.get_move_list()
-        move = self.move_list[0].position if len(self.move_list) != 0 else self.head_position()
+        move = self.get_first_move()
         return self.get_direction(self.head_position(), move)
+
+    def get_first_move(self):
+        current = self.objective_position()
+        start = self.head_position()
+        move = start
+        while current != start:
+            try:
+                move = current
+                current = self.came_from[current]
+            except:
+                break
+
+        return move
 
     def reset_lists(self):
         self.open_list = []
@@ -36,27 +53,48 @@ class PlayerAI(AbstractPlayer):
         self.obstacle_list = []
         self.move_list = []
         self.full_move_list = []
+        self.priority_queue = PriorityQueue()
+        self.blocked_list = []
+        self.came_from = {}
 
-    def get_move_list(self):  # TODO test if current F is the lowest of the graph
-        self.current_node = Node(self.head_position(),0)
-        self.return_tries = 0
-        self.full_move_list = []
+    def get_move_list(self):
+        count = 0
+        start = self.head_position()
+        goal = self.objective_position()
+        self.priority_queue.put((0, start))
+        self.came_from = {}
+        cost_so_far = {}
+        self.came_from[start] = None
+        cost_so_far[start] = 0
 
-        while not self.objective_reached(self.current_node.position, self.objective_position()) and self.return_tries <= self.max_return_tries:
+        while not self.priority_queue.empty():
+            current_position = self.priority_queue.get()[1]
 
-            self.current_node.add_open_list(self.get_open_list(self.current_node.position))
-            closed_node = self.current_node.get_lowest_f(self.full_move_list)
+            if self.objective_reached(current_position, goal):
+                break
 
-            if not (closed_node is None):
-                closed_node.add_closed_node(self.current_node)
-                self.current_node.add_closed_node(closed_node)
-                self.move_list.append(closed_node)
-                self.full_move_list.append(closed_node)
-                self.current_node = closed_node
+            for next_position in self.get_neighbors(current_position):
+                cost = cost_so_far[current_position]
+                new_cost = cost + 1 # Cost of moving a single position is 1
 
-            else:  # No node returned
-                self.return_to_previous_node()
-                self.return_tries += 1
+                if next_position not in cost_so_far or new_cost < cost_so_far[next_position]:
+                    cost_so_far[next_position] = new_cost
+                    priority = new_cost + self.heuristic(next_position, goal)
+                    self.priority_queue.put((priority, next_position))
+                    self.came_from[next_position] = current_position
+
+            count += 1
+
+    def get_neighbors(self, position):
+        neighbors = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+        neighbors_list = []
+
+        for n in neighbors:
+            sum = self.sum_tuple(position, n)
+            if self.is_in_box(sum) and not (sum in self.obstacle_list):
+                neighbors_list.append(sum)
+
+        return neighbors_list
 
     def get_open_list(self, position):
         neighbours = [(0, -1), (1, 0), (0, 1), (-1, 0)]
@@ -102,7 +140,8 @@ class PlayerAI(AbstractPlayer):
         return obstacle_list
 
     @staticmethod
-    def manhattan(start, end):
+    def heuristic(start, end):
+        # Manhattan
         return abs(end[0]-start[0]) + abs(end[1]-start[1])
 
     @staticmethod
@@ -127,7 +166,7 @@ class PlayerAI(AbstractPlayer):
 
     def f(self, start, end):
         g = 1
-        h = self.manhattan(start, end)
+        h = self.heuristic(start, end)
 
         return g + h
 
@@ -162,3 +201,13 @@ class PlayerAI(AbstractPlayer):
         self.graph = Graph(Node(self.head_position(), 0))
         self.current_node = self.graph.root
         self.return_tries = 0
+
+
+class PriorityEntry(object):
+
+    def __init__(self, priority, data):
+        self.priority = priority
+        self.data = data
+
+    def __lt__(self, other):
+        return self.priority > other.priority
