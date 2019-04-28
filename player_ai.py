@@ -81,7 +81,7 @@ class PlayerAI(AbstractPlayer):
             count += 1
 
     def get_neighbors(self, position):
-        neighbors = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+        neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         neighbors_list = []
 
         for n in neighbors:
