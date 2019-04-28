@@ -33,7 +33,17 @@ class PlayerAI(AbstractPlayer):
                 move = current
                 current = self.came_from[current]
             except:     # No path to food possible
+                move = self.survive()
                 break
+
+        return move
+
+    def survive(self):
+        neighbors = self.get_neighbors(self.head_position())
+        move = self.head_position()
+
+        if neighbors:       # If not empty
+            move = neighbors[0]
 
         return move
 

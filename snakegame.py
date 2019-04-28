@@ -22,7 +22,7 @@ class Game:
         self.snake = self.spawn_snake((screen_size//2, screen_size//2), self.game_box)
         self.food = self.spawn_food()
         self.clock = pygame.time.Clock()
-        self.score = score.Score(20, 20, 1)
+        self.score = score.Score(food_value=10, moves_to_decrement=20, score_decrement=1)
         self.player = Player() if human_player else PlayerAI(self.snake, self.food, self.score, self.game_box)
         self.__snake_color__ = [0, 0, 0]
         self.__screen_color__ = [255, 255, 255]
@@ -171,5 +171,5 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=25, delay=10, human_player=False)
+game = Game(screen_size=20, delay=10, human_player=False)
 game.run()
