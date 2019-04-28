@@ -81,11 +81,17 @@ class PlayerAI(AbstractPlayer):
             count += 1
 
     def get_neighbors(self, position, direction_dependant=False, direction=Direction.up):
-        neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
 
-        if direction_dependant:
-            if direction == Direction.right or direction == Direction.left:
-                neighbors = [(0, -1), (0, 1), (-1, 0), (1, 0)]          # Case up or down is included in the initial value
+        if direction_dependant:     # Case up included in the initial values
+            if direction == Direction.right:
+                neighbors = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+
+            elif direction == Direction.down:
+                neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+
+            elif direction == Direction.left:
+                neighbors = [(0, -1), (1, 0), (0, 1), (-1, 0)]
 
         neighbors_list = []
 
