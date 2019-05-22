@@ -30,7 +30,7 @@ class Sensor:
                 if self.game_box.is_occupied(next_position):
                     return next_position
 
-            else:       # TODO returns a position not inside the box. Add physical walls to the game later
+            else:
                 return next_position
 
         return current_position
