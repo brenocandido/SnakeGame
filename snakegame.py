@@ -39,6 +39,8 @@ class Game:
 
         # Size tracking
         self.total_size = 0
+        self.largest_snake = 0
+        self.average_size = 0
 
     def spawn_snake(self, position, game_box):
         _snake = snake.Snake(position, game_box)
@@ -70,6 +72,8 @@ class Game:
 
             return True
 
+        if not self.human_player:
+            pygame.event.clear()
         return False
 
     def get_player_move(self):
@@ -80,7 +84,7 @@ class Game:
     def move(self):
         if self.snake.is_moving():
             if self.snake.direction == Direction.up or self.snake.direction == Direction.down:      # Vertical move
-                k = -1 if self.snake.direction == Direction.up else 1           # Inverted because of screen starting point
+                k = -1 if self.snake.direction == Direction.up else 1       # Inverted because of screen starting point
                 new_position = (self.snake.head().position[0], self.snake.head().position[1] + k)
                 if not self.check_hit(new_position):
                     self.snake.move_head(new_position)
@@ -152,8 +156,8 @@ class Game:
 
     def draw(self):
         self.screen.fill(self.__screen_color__)
-        self.draw_snake()
         self.draw_food()
+        self.draw_snake()
         self.set_display_caption(str(self.score.score))
         pygame.display.update()
 
@@ -177,6 +181,8 @@ class Game:
 
     def score_track(self):
         self.score.score_track()
+        self.get_largest_snake()
+        self.get_average_size()
 
         print("\n----------------------------------",
               "\nGame:", self.score.total_games,
@@ -184,12 +190,17 @@ class Game:
               "\nHigh score:", self.score.high_score,
               "\nAverage score:", self.score.average_score,
               "\nSnake size:", self.snake.size(),
-              "\nAverage size:", self.average_size(),
+              "\nLargest snake:", self.largest_snake,
+              "\nAverage size:", self.average_size,
               "\n----------------------------------\n")
 
-    def average_size(self):
+    def get_largest_snake(self):
+        if self.snake.size() > self.largest_snake:
+            self.largest_snake = self.snake.size()
+
+    def get_average_size(self):
         self.total_size += self.snake.size()
-        return self.total_size//self.score.total_games
+        self.average_size = self.total_size//self.score.total_games
 
     def reset(self):
         self.game_box.reset()
@@ -200,5 +211,5 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=25, delay=0, human_player=False, score_tracking=True)
+game = Game(screen_size=50, box_width=10, delay=0, human_player=False, score_tracking=True)
 game.run()

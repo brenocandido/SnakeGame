@@ -55,9 +55,9 @@ class PlayerAI(AbstractPlayer):
     def get_move_list(self, start, goal):
         self.priority_queue.put((0, start))
         self.came_from = {}
-        cost_so_far = {}
+        cost_so_far = {start: 0}
         self.came_from[start] = None
-        cost_so_far[start] = 0
+        # cost_so_far[start] = 0
 
         while not self.priority_queue.empty():
             current_position = self.priority_queue.get()[1]
@@ -67,7 +67,7 @@ class PlayerAI(AbstractPlayer):
 
             for next_position in self.get_neighbors(current_position):
                 cost = cost_so_far[current_position]
-                new_cost = cost + 1 # Cost of moving a single position is 1
+                new_cost = cost + 1     # Cost of moving a single position is 1
 
                 if next_position not in cost_so_far or new_cost < cost_so_far[next_position]:
                     cost_so_far[next_position] = new_cost
