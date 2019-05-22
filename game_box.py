@@ -6,12 +6,12 @@ class Item(Enum):
     body = 1
     head = 2
     food = 3
+    wall = 4
 
 
 class Field:
     def __init__(self, item=Item.empty):
         self.item = item
-
 
     def set_item(self, item):
         self.item = item
@@ -28,6 +28,9 @@ class GameBox:
 
     def is_occupied(self, position):
         return self.box[position[0]][position[1]].item != Item.empty
+
+    def is_empty(self, position):
+        return not self.is_occupied(position)
 
     def set_item(self, position, item):
         self.box[position[0]][position[1]].set_item(item)
@@ -46,6 +49,15 @@ class GameBox:
             return True
 
         return False
+
+    def is_in_box(self, position):
+        if 0 <= position[0] < self.side_size and 0 <= position[1] < self.side_size:
+            return True
+
+        return False
+
+    def item(self, position):
+        return self.box[position[0]][position[1]].item
 
     def reset(self):
         for i in range(self.side_size):

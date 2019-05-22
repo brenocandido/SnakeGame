@@ -1,45 +1,48 @@
+from sensor import Sensor
+from a_star import A_Star
 from abstract_player import AbstractPlayer
 from snake import Direction
-from queue import PriorityQueue
 
 
 class PlayerAI(AbstractPlayer):
 
-    def __init__(self, snake, food, score, box):
-        self.priority_queue = PriorityQueue()
+    def __init__(self, snake, food, score, box, genetic=False, sensor_range=7):
         self.snake = snake
         self.food = food
         self.score = score
         self.box = box
+
         self.obstacle_list = []
-        self.came_from = {}
+        self.a_star = A_Star(box)
+
+        self.genetic = genetic
+
+        if genetic:
+            self.sensor_list = []
+            direction_list = [Direction.up, Direction.right, Direction.down, Direction.left]
+
+            for sensor_direction in direction_list:
+                self.sensor_list.append(Sensor(sensor_range, sensor_direction, self.snake, self.box))
 
     def get_move(self):
-        return self.get_a_star_move(self.head_position(), self.objective_position())
+        return self.get_a_star_move()
 
-    def get_a_star_move(self, start, goal):
-
-        self.reset_lists()
+    def get_a_star_move(self):
         self.obstacle_list = self.get_obstacle_list()
-        self.get_move_list(start, goal)
-        move = self.get_first_move(start, goal)
-        return self.get_direction(start, move)
 
-    def get_first_move(self, start, goal):
-        current = goal
-        move = start
-        while current != start:
-            try:
-                move = current
-                current = self.came_from[current]
-            except:     # No path to food possible
-                move = self.survive()
-                break
+        move_list = self.a_star.get_a_star_move_list(self.head_position(),
+                                                     self.objective_position(), self.obstacle_list)
 
-        return move
+        try:
+            move = move_list[0]
+        except:                 # No path to food possible
+            move = self.survive()
+
+        return self.get_direction(self.head_position(), move)
 
     def survive(self):
-        neighbors = self.get_neighbors(self.head_position(), direction_dependant=True, direction=self.snake.direction)
+        neighbors = self.a_star.get_neighbors(self.head_position(), self.obstacle_list,
+                                              direction_dependant=True, direction=self.snake.direction)
         move = self.head_position()
 
         if neighbors:       # If not empty
@@ -49,53 +52,6 @@ class PlayerAI(AbstractPlayer):
 
     def reset_lists(self):
         self.obstacle_list = []
-        self.priority_queue = PriorityQueue()
-        self.came_from = {}
-
-    def get_move_list(self, start, goal):
-        self.priority_queue.put((0, start))
-        self.came_from = {}
-        cost_so_far = {start: 0}
-        self.came_from[start] = None
-        # cost_so_far[start] = 0
-
-        while not self.priority_queue.empty():
-            current_position = self.priority_queue.get()[1]
-
-            if self.objective_reached(current_position, goal):
-                break
-
-            for next_position in self.get_neighbors(current_position):
-                cost = cost_so_far[current_position]
-                new_cost = cost + 1     # Cost of moving a single position is 1
-
-                if next_position not in cost_so_far or new_cost < cost_so_far[next_position]:
-                    cost_so_far[next_position] = new_cost
-                    priority = new_cost + self.heuristic(next_position, goal)
-                    self.priority_queue.put((priority, next_position))
-                    self.came_from[next_position] = current_position
-
-    def get_neighbors(self, position, direction_dependant=False, direction=Direction.up):
-        neighbors = [(1, 0), (0, -1), (-1, 0), (0, 1)]
-
-        if direction_dependant:     # Case up included in the initial values
-            if direction == Direction.right:
-                neighbors = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-
-            elif direction == Direction.down:
-                neighbors = [(0, 1), (1, 0), (-1, 0), (0, -1)]
-
-            elif direction == Direction.left:
-                neighbors = [(0, 1), (-1, 0), (0, -1), (1, 0)]
-
-        neighbors_list = []
-
-        for n in neighbors:
-            sum = self.sum_tuple(position, n)
-            if self.is_in_box(sum) and not (sum in self.obstacle_list):
-                neighbors_list.append(sum)
-
-        return neighbors_list
 
     def head_position(self):
         return self.snake.head().position
@@ -108,15 +64,6 @@ class PlayerAI(AbstractPlayer):
 
         return obstacle_list
 
-    @staticmethod
-    def heuristic(start, end):
-        # Manhattan
-        return abs(end[0]-start[0]) + abs(end[1]-start[1])
-
-    @staticmethod
-    def sum_tuple( a, b):
-        return a[0] + b[0], a[1] + b[1]
-
     def is_in_box(self, position):
         if 0 <= position[0] < self.box.size() and 0 <= position[1] < self.box.size():
             return True
@@ -127,8 +74,8 @@ class PlayerAI(AbstractPlayer):
         return self.food.position
 
     @staticmethod
-    def objective_reached(position, objective_posisiton):
-        return position == objective_posisiton
+    def objective_reached(position, objective_positon):
+        return position == objective_positon
 
     def update_food(self, food):
         self.food = food

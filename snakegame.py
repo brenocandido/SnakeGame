@@ -148,7 +148,8 @@ class Game:
 
         return False
 
-    def is_backwards_move(self, current_direction, new_direction):
+    @staticmethod
+    def is_backwards_move(current_direction, new_direction):
         if current_direction.value + new_direction.value == 0:
             return True
 
@@ -161,7 +162,8 @@ class Game:
         self.set_display_caption(str(self.score.score))
         pygame.display.update()
 
-    def set_display_caption(self, caption):
+    @staticmethod
+    def set_display_caption(caption):
         pygame.display.set_caption(caption)
 
     def draw_snake(self):
