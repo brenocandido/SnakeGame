@@ -1,28 +1,19 @@
-from sensor import Sensor
-from a_star import A_Star
+
+from astar import AStar
 from abstract_player import AbstractPlayer
 from snake import Direction
 
 
 class PlayerAI(AbstractPlayer):
 
-    def __init__(self, snake, food, score, box, genetic=False, sensor_range=7):
+    def __init__(self, snake, food, score, box):
         self.snake = snake
         self.food = food
         self.score = score
         self.box = box
 
         self.obstacle_list = []
-        self.a_star = A_Star(box)
-
-        self.genetic = genetic
-
-        if genetic:
-            self.sensor_list = []
-            direction_list = [Direction.up, Direction.right, Direction.down, Direction.left]
-
-            for sensor_direction in direction_list:
-                self.sensor_list.append(Sensor(sensor_range, sensor_direction, self.snake, self.box))
+        self.a_star = AStar(box)
 
     def get_move(self):
         return self.get_a_star_move()

@@ -2,7 +2,8 @@
 from queue import PriorityQueue
 from snake import Direction
 
-class A_Star:
+
+class AStar:
 
     def __init__(self, box):
         self.priority_queue = PriorityQueue()
