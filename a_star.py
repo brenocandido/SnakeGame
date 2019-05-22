@@ -87,4 +87,4 @@ class A_Star:
 
     def reset_lists(self):
         self.priority_queue = PriorityQueue()
-        self.came_from = {}
+        self.came_from.clear()

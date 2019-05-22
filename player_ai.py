@@ -6,11 +6,12 @@ from snake import Direction
 
 class PlayerAI(AbstractPlayer):
 
-    def __init__(self, snake, food, score, box, genetic=False, sensor_range=7):
+    def __init__(self, snake, food, score, box, wall_list, genetic=False, sensor_range=7):
         self.snake = snake
         self.food = food
         self.score = score
         self.box = box
+        self.wall_list = wall_list
 
         self.obstacle_list = []
         self.a_star = A_Star(box)
@@ -51,7 +52,7 @@ class PlayerAI(AbstractPlayer):
         return move
 
     def reset_lists(self):
-        self.obstacle_list = []
+        self.obstacle_list.clear()
 
     def head_position(self):
         return self.snake.head().position
@@ -61,6 +62,10 @@ class PlayerAI(AbstractPlayer):
         for body in self.snake.body:
             if body != self.snake.head():
                 obstacle_list.append(body.position)
+
+        for wall in self.wall_list:
+            if wall not in obstacle_list:
+                obstacle_list.append(wall)
 
         return obstacle_list
 

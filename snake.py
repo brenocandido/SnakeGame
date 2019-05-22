@@ -90,6 +90,6 @@ class Snake:
     def reset(self):
         self.state = State.idle
         self.direction = self.__initial_direction__
-        self.body = []
+        self.body.clear()
         self.initial_spawn(self.__starting_position__)
         self.size_up = False

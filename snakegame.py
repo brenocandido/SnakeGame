@@ -6,6 +6,7 @@ import score
 from snake import Direction
 from player import Player
 from player_ai import PlayerAI
+from game_box import Item
 
 
 class Game:
@@ -25,9 +26,11 @@ class Game:
 
         self.game_box = game_box.GameBox(screen_size)
         self.screen = pygame.display.set_mode([screen_width, screen_width])
+        self.walls_list = []
+        self.spawn_walls()
         self.snake = self.spawn_snake((screen_size//2, screen_size//2), self.game_box)
         self.food = self.spawn_food()
-        self.player = Player() if human_player else PlayerAI(self.snake, self.food, self.score, self.game_box)
+        self.player = Player() if human_player else PlayerAI(self.snake, self.food, self.score, self.game_box, self.walls_list)
         self.human_player = human_player
 
         self.__delay__ = delay
@@ -36,13 +39,15 @@ class Game:
         self.__snake_color__ = [0, 0, 0]
         self.__screen_color__ = [255, 255, 255]
         self.__food_color__ = [255, 0, 0]
+        self.__wall_color__ = [50, 50, 50]
 
         # Size tracking
         self.total_size = 0
         self.largest_snake = 0
         self.average_size = 0
 
-    def spawn_snake(self, position, game_box):
+    @staticmethod
+    def spawn_snake(position, game_box):
         _snake = snake.Snake(position, game_box)
         return _snake
 
@@ -124,14 +129,28 @@ class Game:
             self.player.update_food(food)
         return food
 
+    def spawn_walls(self):
+        self.walls_list.clear()
+        side = self.__screen_size__
+        for i in range(side):
+            self.__insert_wall__((0, i))
+            self.__insert_wall__((side - 1, i))
+            self.__insert_wall__((i, 0))
+            self.__insert_wall__((i, side - 1))
+
+    def __insert_wall__(self, position):
+        if position not in self.walls_list:
+            self.walls_list.append(position)
+            self.game_box.set_item(position, Item.wall)
+
     def is_on_food(self):
         return self.food.position == self.snake.head().position
 
     def check_wall_hit(self, position):
-        if 0 <= position[0] < self.__screen_size__ and 0 <= position[1] < self.__screen_size__:
-            return False
+        if position in self.walls_list:
+            return True
 
-        return True
+        return False
 
     def check_collision(self):
         for part in self.snake.body:
@@ -158,6 +177,7 @@ class Game:
     def draw(self):
         self.screen.fill(self.__screen_color__)
         self.draw_food()
+        self.draw_walls()
         self.draw_snake()
         self.set_display_caption(str(self.score.score))
         pygame.display.update()
@@ -173,6 +193,14 @@ class Game:
             y1 = part.position[1] * self.__box_width__
             y2 = self.__box_width__
             pygame.draw.rect(self.screen, self.__snake_color__, [x1, y1, x2, y2])
+
+    def draw_walls(self):
+        for wall in self.walls_list:
+            x1 = wall[0]*self.__box_width__
+            x2 = self.__box_width__
+            y1 = wall[1] * self.__box_width__
+            y2 = self.__box_width__
+            pygame.draw.rect(self.screen, self.__wall_color__, [x1, y1, x2, y2])
 
     def draw_food(self):
         x1 = self.food.position[0]*self.__box_width__
@@ -206,6 +234,7 @@ class Game:
 
     def reset(self):
         self.game_box.reset()
+        self.spawn_walls()
         self.snake.reset()
         self.__hit__ = False
         self.food = self.spawn_food()
