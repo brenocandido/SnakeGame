@@ -1,5 +1,5 @@
 from sensor import Sensor
-from a_star import A_Star
+from a_star import AStar
 from abstract_player import AbstractPlayer
 from snake import Direction
 
@@ -14,7 +14,7 @@ class PlayerAI(AbstractPlayer):
         self.wall_list = wall_list
 
         self.obstacle_list = []
-        self.a_star = A_Star(box)
+        self.a_star = AStar(box)
 
         self.genetic = genetic
 
