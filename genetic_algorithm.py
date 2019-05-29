@@ -4,7 +4,7 @@ import numpy as np
 
 class GeneticAlgorithm:
 
-    def __init__(self, fittest_percent=0.5, mutation_chance=0.05, crossover_points=1):
+    def __init__(self, fittest_percent=0.2, mutation_chance=0.05, crossover_points=1):
 
         self.fittest_percent = fittest_percent          # Percentage of population selected as mating pool
         self.mutation_chance = mutation_chance
@@ -107,10 +107,10 @@ class GeneticAlgorithm:
         return crossover_genome
 
 
-a = np.array([[1., 1.5], [2., 2.5], [3., 3.5], [4., 4.5], [5., 5.5], [6., 6.5], [7., 7.5], [8., 8.5], [9., 9.5]])
-f = np.array([0, 1, 2, 3, 4, 3, 2, 1, 0])
-ga = GeneticAlgorithm(fittest_percent=0.2, mutation_chance=0.05, crossover_points=1)
-
-new_pop = ga.generate_new_population(a, f)
-print(a)
-print(new_pop)
+# a = np.array([[1., 1.5], [2., 2.5], [3., 3.5], [4., 4.5], [5., 5.5], [6., 6.5], [7., 7.5], [8., 8.5], [9., 9.5]])
+# f = np.array([0, 1, 2, 3, 4, 3, 2, 1, 0])
+# ga = GeneticAlgorithm(fittest_percent=0.2, mutation_chance=0.05, crossover_points=1)
+#
+# new_pop = ga.generate_new_population(a, f)
+# print(a)
+# print(new_pop)
