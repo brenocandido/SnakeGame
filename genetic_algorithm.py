@@ -15,13 +15,61 @@ class GeneticAlgorithm:
         # Setting a seed from /udev
         np.random.seed()
 
+    def generate_new_population(self, population, fitness):
+
+        assert len(population) == len(fitness)
+
+        population_size = len(population)
+        genome_size  = len(population[0])
+        fittest = self.select_fittest(population, fitness)
+
+        # Number of children created
+        offspring_size = population_size - len(fittest)
+        offspring = np.empty(offspring_size*genome_size).reshape(offspring_size, genome_size)
+
+        for i in range(offspring_size):
+            parents = self.select_parents(fittest)
+
+            # Executes crossover and mutates
+            offspring[i] = self.mutate(self.crossover(*parents))
+
+        new_population = np.concatenate((fittest, offspring))
+
+        return new_population
+
+    @staticmethod
+    def select_parents(fittest):
+        fittest_indexes = list(range(len(fittest)))
+        genome_size = len(fittest[0])
+
+        parents = np.empty(2*genome_size).reshape(2, genome_size)
+
+        for i in range(2):
+            parent_index = np.random.choice(fittest_indexes)
+            fittest_indexes.remove(parent_index)
+
+            parents[i] = fittest[parent_index]
+
+        return parents
+
     def select_fittest(self, population, fitness):
         assert len(population) == len(fitness)
 
         population_size = len(population)
-        fittest_size = int(population_size*self.fittest_percent)
+        genome_size = len(population[0])
+        fittest_size = int(np.ceil(population_size*self.fittest_percent))
+        fitness_copy = np.copy(fitness)
 
-        fittest = np.empty(fittest_size)
+        fittest = np.empty(fittest_size*genome_size).reshape(fittest_size, genome_size)
+
+        for i in range(fittest_size):
+            # Gets the index of the maximum fitness
+            max_fitness_index = np.where(fitness_copy == np.amax(fitness_copy))[0][0]
+
+            fittest[i] = population[max_fitness_index]
+            fitness_copy[max_fitness_index] = -99999999
+
+        return fittest
 
     def mutate(self, genome):
 
@@ -59,11 +107,10 @@ class GeneticAlgorithm:
         return crossover_genome
 
 
-a = np.array([1., 2., 3., 4., 5.])
-b = np.array([6., 7., 8., 9., 10.])
-ga = GeneticAlgorithm(1, mutation_chance=0.05, crossover_points=1)
-crossover = ga.crossover(a, b)
-print(crossover)
-mutation = ga.mutate(crossover)
-print(mutation)
+a = np.array([[1., 1.5], [2., 2.5], [3., 3.5], [4., 4.5], [5., 5.5], [6., 6.5], [7., 7.5], [8., 8.5], [9., 9.5]])
+f = np.array([0, 1, 2, 3, 4, 3, 2, 1, 0])
+ga = GeneticAlgorithm(fittest_percent=0.2, mutation_chance=0.05, crossover_points=1)
 
+new_pop = ga.generate_new_population(a, f)
+print(a)
+print(new_pop)
