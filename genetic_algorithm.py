@@ -20,7 +20,7 @@ class GeneticAlgorithm:
         assert len(population) == len(fitness)
 
         population_size = len(population)
-        genome_size  = len(population[0])
+        genome_size = len(population[0])
         fittest = self.select_fittest(population, fitness)
 
         # Number of children created
@@ -81,7 +81,8 @@ class GeneticAlgorithm:
             choice = np.random.random()
             if self.mutation_chance >= choice:
 
-                mutated_gene = np.random.normal(genome[gene])
+                mutated_gene = np.random.rand() * 2 - 1
+                # mutated_gene = np.random.normal(genome[gene])
                 mutated_genome[gene] = mutated_gene
 
         return mutated_genome
@@ -92,7 +93,7 @@ class GeneticAlgorithm:
 
         # Distance between each crossover point
         crossover_delta = int(np.floor(len(genome_a)/(self.crossover_points + 1)))
-        assert crossover_delta >= 1
+        crossover_delta = 1 if crossover_delta > 1 else crossover_delta
 
         crossover_genome = genome_a
 
@@ -105,12 +106,3 @@ class GeneticAlgorithm:
                 crossover_genome = np.concatenate((crossover_genome[0:crossover_index], genome_a[crossover_index:]))
 
         return crossover_genome
-
-
-# a = np.array([[1., 1.5], [2., 2.5], [3., 3.5], [4., 4.5], [5., 5.5], [6., 6.5], [7., 7.5], [8., 8.5], [9., 9.5]])
-# f = np.array([0, 1, 2, 3, 4, 3, 2, 1, 0])
-# ga = GeneticAlgorithm(fittest_percent=0.2, mutation_chance=0.05, crossover_points=1)
-#
-# new_pop = ga.generate_new_population(a, f)
-# print(a)
-# print(new_pop)

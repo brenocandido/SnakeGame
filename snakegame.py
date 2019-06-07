@@ -28,10 +28,12 @@ class Game:
         self.screen = pygame.display.set_mode([screen_width, screen_width])
         self.walls_list = []
         self.spawn_walls()
-        self.snake = self.spawn_snake((screen_size//2, screen_size//2), self.game_box)
-        self.food = self.spawn_food()
-        self.player = Player() if human_player else PlayerAI(self.snake, self.food, self.score, self.game_box, self.walls_list)
+
+        self.snake = None
+        self.food = None
+        self.player = None
         self.human_player = human_player
+        self.setup_game()
 
         self.__delay__ = delay
         self.is_running = True
@@ -45,6 +47,12 @@ class Game:
         self.total_size = 0
         self.largest_snake = 0
         self.average_size = 0
+
+    def setup_game(self):
+        self.snake = self.spawn_snake((self.__screen_size__//2, self.__screen_size__//2), self.game_box)
+        self.food = self.spawn_food()
+        self.player = Player() if self.human_player else PlayerAI(self.snake, self.food, self.score,
+                                                                  self.game_box, self.walls_list)
 
     @staticmethod
     def spawn_snake(position, game_box):
@@ -242,5 +250,6 @@ class Game:
         self.player.reset()
 
 
-game = Game(screen_size=50, box_width=10, delay=0, human_player=False, score_tracking=True)
-game.run()
+if __name__ == "__main__":
+    game = Game(screen_size=50, box_width=10, delay=0, human_player=False, score_tracking=True)
+    game.run()

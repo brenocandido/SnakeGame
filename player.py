@@ -28,9 +28,6 @@ class Player(AbstractPlayer):
 
         return new_direction
 
-            # if not self.is_backwards_move(self.snake.direction, new_direction):
-            #     self.snake.turn(new_direction)
-
     def __get_event__(self):
         for event in self.event_buffer:
             if event == pygame.NOEVENT:

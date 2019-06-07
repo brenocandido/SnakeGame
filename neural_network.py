@@ -17,7 +17,8 @@ class NeuralNetwork:
         # Generating layers weights
         previous_layer_nodes = inputs
         for i in range(self.hidden_layers_number):
-            self.weights.append(np.random.random((hidden_layers[i], previous_layer_nodes)))
+            # Generates weights between -1 and 1
+            self.weights.append(np.random.random((hidden_layers[i], previous_layer_nodes))*2 - 1)
             previous_layer_nodes = hidden_layers[i]
 
         # Appending last layer weights before output
@@ -90,16 +91,16 @@ class NeuralNetwork:
 
         return s
 
-# TODO remove this part after testing is done
-def main():
-    x = np.array([4, -2, 1, 3])
 
-    epochs = 1000
+def main():
+    x = np.array([102, -204, 70, 10])
+
+    epochs = 10000
 
     net_input = 4
     net_output = 1
-    net_hidden_layer = [3]
-    ga = GeneticAlgorithm()
+    net_hidden_layer = [5, 3]
+    ga = GeneticAlgorithm(fittest_percent=0.5, mutation_chance=0.01, crossover_points=1)
 
     pop_size = 50
 
@@ -109,23 +110,27 @@ def main():
 
     fitness_array = []
     out_print = []
+    out_print_mean = []
 
     for n in range(epochs):
         fitness = np.empty(len(nn))
         out_array = np.empty(len(nn))
         pop_weights = []
+        max_fitness = -999999999
+        max_fitness_index = 0
 
         for net in range(len(nn)):
             out = nn[net].think(x)[0]
-            fitness[net] = -((out - 50000)**2)
+            fitness[net] = -(0.1*out**4 + 1*out**3 - 1000*out**2 + 2)
+            if fitness[net] > max_fitness:
+                max_fitness = fitness[net]
+                max_fitness_index = net
             out_array[net] = out
             pop_weights.append(nn[net].weights_to_array())
 
-        fit_mean = fitness.mean()
-        out_mean = out_array.mean()
-
-        fitness_array.append(fit_mean)
-        out_print.append(out_mean)
+        fitness_array.append(fitness.mean())
+        out_print.append(out_array[max_fitness_index])
+        out_print_mean.append(out_array.mean())
 
         pop_weights = np.array(pop_weights)
         new_pop = ga.generate_new_population(pop_weights, fitness)
@@ -133,8 +138,13 @@ def main():
         for net in range(len(nn)):
             nn[net].array_to_weights(new_pop[net])
 
+    plt.figure()
+    plt.subplot(211)
     plt.plot(out_print)
+    plt.subplot(212)
+    plt.plot(out_print_mean)
     plt.show()
 
 
-main()
+if __name__ == "__main__":
+    main()
