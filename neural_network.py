@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 class NeuralNetwork:
 
-    def __init__(self, inputs, outputs, hidden_layers=[]):
+    def __init__(self, inputs=7, outputs=3, hidden_layers=[]):
 
         np.random.seed()
         self.weights = []
@@ -31,19 +31,19 @@ class NeuralNetwork:
         output = inputs
         for i in range(len(self.weights)):
             nodes_w = self.weights[i]
-            output = np.empty(len(nodes_w))
+            output = np.zeros(len(nodes_w))
 
             for j in range(len(nodes_w)):
                 weights = nodes_w[j]
 
                 # Use softmax if outputting
-                # if i == len(self.weights) - 1:
-                #     output[j] = self.softmax(self.perceptron(x, weights))
+                if i == len(self.weights) - 1:
+                    output[j] = self.softmax(self.perceptron(x, weights))
                 # Use sigmoid
-                # else:
-                #     output[j] = self.sigmoid(self.perceptron(x, weights))
+                else:
+                    output[j] = self.sigmoid(self.perceptron(x, weights))
 
-                output[j] = self.perceptron(x, weights)
+                # output[j] = self.perceptron(x, weights)
 
             x = output
 
@@ -95,10 +95,10 @@ class NeuralNetwork:
 def main():
     x = np.array([102, -204, 70, 10])
 
-    epochs = 10000
+    epochs = 1000
 
     net_input = 4
-    net_output = 1
+    net_output = 3
     net_hidden_layer = [5, 3]
     ga = GeneticAlgorithm(fittest_percent=0.5, mutation_chance=0.01, crossover_points=1)
 
@@ -121,29 +121,29 @@ def main():
 
         for net in range(len(nn)):
             out = nn[net].think(x)[0]
-            fitness[net] = -(0.1*out**4 + 1*out**3 - 1000*out**2 + 2)
-            if fitness[net] > max_fitness:
-                max_fitness = fitness[net]
-                max_fitness_index = net
-            out_array[net] = out
-            pop_weights.append(nn[net].weights_to_array())
+        #     fitness[net] = -(0.1*out**4 + 1*out**3 - 1000*out**2 + 2)
+        #     if fitness[net] > max_fitness:
+        #         max_fitness = fitness[net]
+        #         max_fitness_index = net
+        #     out_array[net] = out
+        #     pop_weights.append(nn[net].weights_to_array())
+        #
+        # fitness_array.append(fitness.mean())
+        # out_print.append(out_array[max_fitness_index])
+        # out_print_mean.append(out_array.mean())
+        #
+        # pop_weights = np.array(pop_weights)
+        # new_pop = ga.generate_new_population(pop_weights, fitness)
+        #
+        # for net in range(len(nn)):
+        #     nn[net].array_to_weights(new_pop[net])
 
-        fitness_array.append(fitness.mean())
-        out_print.append(out_array[max_fitness_index])
-        out_print_mean.append(out_array.mean())
-
-        pop_weights = np.array(pop_weights)
-        new_pop = ga.generate_new_population(pop_weights, fitness)
-
-        for net in range(len(nn)):
-            nn[net].array_to_weights(new_pop[net])
-
-    plt.figure()
-    plt.subplot(211)
-    plt.plot(out_print)
-    plt.subplot(212)
-    plt.plot(out_print_mean)
-    plt.show()
+    # plt.figure()
+    # plt.subplot(211)
+    # plt.plot(out_print)
+    # plt.subplot(212)
+    # plt.plot(out_print_mean)
+    # plt.show()
 
 
 if __name__ == "__main__":

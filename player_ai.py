@@ -6,10 +6,9 @@ from snake import Direction
 
 class PlayerAI(AbstractPlayer):
 
-    def __init__(self, snake, food, score, box):
+    def __init__(self, snake, food, box):
         self.snake = snake
         self.food = food
-        self.score = score
         self.box = box
 
     def get_move(self):

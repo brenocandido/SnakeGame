@@ -1,8 +1,9 @@
 
 class Score:
 
-    def __init__(self, food_value = 20, moves_to_decrement = 20, score_decrement = 1):
-        self.score = 0
+    def __init__(self, food_value=200, moves_to_decrement=2, score_decrement=1, initial_score=0):
+        self.initial_score = initial_score
+        self.score = initial_score
         self.food_value = food_value
         self.moves_to_decrement = moves_to_decrement
         self.score_decrement = score_decrement
@@ -15,7 +16,7 @@ class Score:
         self.total_games = 0
 
     def reset(self):
-        self.score = 0
+        self.score = self.initial_score
         self.move_count = 0
         self.eat_flag = False
 
@@ -49,7 +50,6 @@ class Score:
     def calculate_average_score(self):
         self.total_score += self.score
         self.average_score = self.total_score//self.total_games
-
 
     def refresh(self):
         self.move_increment()

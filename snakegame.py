@@ -22,7 +22,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.score_tracking = score_tracking
-        self.score = score.Score(food_value=10, moves_to_decrement=10, score_decrement=1)
+        self.score = score.Score(food_value=200, moves_to_decrement=1, score_decrement=2, initial_score=1000)
 
         self.game_box = game_box.GameBox(screen_size)
         self.screen = pygame.display.set_mode([screen_width, screen_width])
@@ -60,17 +60,28 @@ class Game:
         return _snake
 
     def run(self):
+        self.draw()
         while self.is_running:
-            self.draw()
             pygame.time.wait(self.__delay__)
-            self.snake.start()
-            if not self.snake.is_dead():
-                self.play_turn()
-                if self.is_on_food():
-                    self.eat_food()
-            else:
-                pygame.time.wait(1000)
-                self.reset()
+            self.play()
+
+        pygame.quit()
+
+    def play(self):
+        self.snake.start()
+        if not self.snake.is_dead():
+            self.play_turn()
+            self.check_food()
+
+        else:
+            pygame.time.wait(1000)
+            self.reset()
+
+        self.draw()
+
+    def check_food(self):
+        if self.is_on_food():
+            self.eat_food()
 
     def play_turn(self):
         if not self.check_player_quit():
@@ -81,7 +92,6 @@ class Game:
     def check_player_quit(self):
         if pygame.event.peek(pygame.QUIT):
             self.is_running = False
-            pygame.quit()
 
             return True
 
