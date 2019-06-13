@@ -62,4 +62,5 @@ class GameBox:
     def reset(self):
         for i in range(self.side_size):
             for j in range(self.side_size):
-                self.box[i][j].set_item(Item.empty)
+                if self.box[i][j].item != Item.wall:
+                    self.box[i][j].set_item(Item.empty)

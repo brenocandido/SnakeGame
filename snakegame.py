@@ -5,7 +5,7 @@ import game_box
 import score
 from snake import Direction
 from player import Player
-from player_ai import PlayerAI
+from player_ai_astar import PlayerAIAStar
 from game_box import Item
 
 
@@ -51,8 +51,8 @@ class Game:
     def setup_game(self):
         self.snake = self.spawn_snake((self.__screen_size__//2, self.__screen_size__//2), self.game_box)
         self.food = self.spawn_food()
-        self.player = Player() if self.human_player else PlayerAI(self.snake, self.food, self.score,
-                                                                  self.game_box, self.walls_list)
+        self.player = Player() if self.human_player else PlayerAIAStar(self.snake, self.food, self.score,
+                                                                       self.game_box, self.walls_list)
 
     @staticmethod
     def spawn_snake(position, game_box):
@@ -242,7 +242,7 @@ class Game:
 
     def reset(self):
         self.game_box.reset()
-        self.spawn_walls()
+        # self.spawn_walls()
         self.snake.reset()
         self.__hit__ = False
         self.food = self.spawn_food()

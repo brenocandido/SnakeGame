@@ -1,3 +1,4 @@
+from snake import Snake
 from snakegame import Game
 from genetic_algorithm import GeneticAlgorithm
 from neural_network import NeuralNetwork
@@ -15,13 +16,18 @@ class GeneticGame(Game):
         self.algorithm = GeneticAlgorithm(fittest_percent, mutation_chance, crossover_points)
         self.network = NeuralNetwork(inputs, outputs, hidden_layers)
 
+        self.snake_list = []
+
     def setup_game(self):
-        self.snake = []
         for i in range(self.population_size):
-            self.snake.append(self.spawn_snake(self.__screen_size__//2, self.__screen_size__//2), self.game_box)
+            self.snake_list.append(self.spawn_snake((self.__screen_size__//2, self.__screen_size__//2), self.game_box))
+
+        self.snake = self.snake_list[0]
+        self.food = self.spawn_food()
+        self.player =
 
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # game = GeneticGame(human_player=False, score_tracking=True)
     # game.run()

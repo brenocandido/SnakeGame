@@ -4,11 +4,11 @@ from game_box import Item
 
 class Sensor:
 
-    def __init__(self, sensor_range, direction, snake, game_box):
-        self.sensor_range = sensor_range
+    def __init__(self, direction, snake, game_box, sensor_range=0):
         self.direction = direction
         self.snake = snake
         self.game_box = game_box
+        self.sensor_range = sensor_range
 
     def object_in_range(self):
         return self.get_object_position() == self.snake.head().position
