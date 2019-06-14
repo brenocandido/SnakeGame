@@ -35,9 +35,10 @@ class PlayerAIGenetic(PlayerAI):
 
     def get_inputs(self):
         sensors = self.get_sensors_inputs()
-        food = self.get_food_inputs()
+        food_horizontal = self.get_food_input_right_left()
+        food_vertical = self.get_food_input_front_back()
         # tail = self.get_tail_inputs()
-        return np.concatenate((sensors, food))
+        return np.concatenate((sensors, food_horizontal, food_vertical))
 
     def get_sensors_inputs(self):
         current_direction_index = 0
@@ -65,6 +66,32 @@ class PlayerAIGenetic(PlayerAI):
     def get_food_inputs(self):
         return self.get_inputs_xy(self.food.position)
 
+    def get_food_input_right_left(self):
+        food = self.get_food_inputs()
+        food_x = food[0]
+
+        food_left = 0
+        food_right = 0
+        if food_x > 0:
+            food_right = food_x
+        else:
+            food_left = abs(food_x)
+
+        return food_right, food_left
+
+    def get_food_input_front_back(self):
+        food = self.get_food_inputs()
+        food_y = food[1]
+
+        food_front = 0
+        food_back = 0
+        if food_y > 0:
+            food_front = food_y
+        else:
+            food_back = abs(food_y)
+
+        return food_front, food_back
+
     # down: -x, y
     # left: -y, -x
     # up:   x, -y
@@ -86,9 +113,9 @@ class PlayerAIGenetic(PlayerAI):
 
         direction = self.snake.direction
         if direction == Direction.down or direction == Direction.left:
-                x_out = -x_out
+            x_out = -x_out
         if direction == Direction.up or direction == Direction.left:
-                y_out = -y_out
+            y_out = -y_out
 
         return np.array([x_out, y_out])
 
@@ -116,7 +143,7 @@ class PlayerAIGenetic(PlayerAI):
         # if output < 0:
         #     normal_out = -(self.box.size() - (-output)) / self.box.size()
         # else:
-        #     normal_out = (self.box.size() - (output - 1)) / self.box.size()
+        #     normal_out = (self.box.size() - (output)) / self.box.size()
         normal_out = output/self.box.size()
 
         return normal_out

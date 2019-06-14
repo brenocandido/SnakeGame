@@ -18,7 +18,7 @@ class NeuralNetwork:
         previous_layer_nodes = inputs
         for i in range(self.hidden_layers_number):
             # Generates weights between -1 and 1
-            self.weights.append(np.random.random((previous_layer_nodes, hidden_layers[i]))*2 - 1)
+            self.weights.append((np.random.random((previous_layer_nodes, hidden_layers[i]))*2 - 1)*100)
             previous_layer_nodes = hidden_layers[i]
 
         # Appending last layer weights before output
@@ -38,7 +38,8 @@ class NeuralNetwork:
             # Use sigmoid
             else:
                 # output = self.sigmoid(self.perceptron(x, nodes_w))*2 - 1
-                output = np.tanh(self.perceptron(x, nodes_w))
+                output = self.sigmoid(self.perceptron(x, nodes_w))
+                # output = np.tanh(self.perceptron(x, nodes_w))
 
             x = output
 

@@ -81,7 +81,7 @@ class GeneticAlgorithm:
             choice = np.random.random()
             if self.mutation_chance >= choice:
 
-                mutated_gene = np.random.rand() * 2 - 1
+                mutated_gene = (np.random.rand() * 2 - 1)*100
                 # mutated_gene = np.random.normal(genome[gene])
                 mutated_genome[gene] = mutated_gene
 

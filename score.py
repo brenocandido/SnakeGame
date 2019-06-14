@@ -72,10 +72,10 @@ class Score:
             self.high_score = self.score
 
     def ate_itself(self):
-        self.score_subtract(self.food_value)
+        self.score_subtract(100)
 
     def hit_wall(self):
-        self.score_subtract(self.food_value*0.5)
+        self.score_subtract(100)
 
     def score_subtract(self, amount):
         self.score -= amount
@@ -87,7 +87,7 @@ class Score:
         self.average_score = self.total_score//self.total_games
 
     def get_final_score(self):
-        return self.score +  self.times_ate_food*self.food_value
+        return self.score*(self.move_count*0.1) + self.times_ate_food*self.food_value
 
     def refresh(self, turned=False):
         self.move_increment()

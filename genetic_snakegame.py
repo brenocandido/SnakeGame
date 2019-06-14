@@ -29,7 +29,7 @@ class GeneticGame(Game):
         for i in range(self.population_size):
             self.network_list.append(NeuralNetwork(inputs, outputs, hidden_layers))
 
-        super().__init__(screen_size=screen_size, delay=delay, box_width=box_width, human_player=True,
+        super().__init__(screen_size=screen_size, delay=delay, box_width=box_width, human_player=False,
                          food_value=food_value, moves_to_decrement=moves_to_decrement, score_decrement=score_decrement,
                          score_increment=score_increment, initial_score=initial_score, score_tracking=score_tracking,
                          score_decrement_move=score_decrement_move, turn_decrement_factor=turn_decrement_factor)
@@ -51,6 +51,7 @@ class GeneticGame(Game):
 
             # Kill snake if score reaches 0 (requiers initial score)
             if self.score.score == 0:
+                self.score.score = 0
                 self.snake_death()
 
         else:
@@ -71,19 +72,17 @@ class GeneticGame(Game):
             self.score.hit_wall()
 
     def get_fitness(self):
-        self.snake.reset()
-        self.fitness_list[self.current_individual_index] = self.score.get_final_score()
+        fitness = self.score.get_final_score()
+        self.fitness_list[self.current_individual_index] = fitness
 
     def next_individual(self):
-        self.current_individual_index += 1
+        self.get_fitness()
 
+        self.current_individual_index += 1
         if self.current_individual_index == self.population_size:
             print("Generation " + str(self.generation) + " finished")
             self.end_epoch()
-        else:
-            self.get_fitness()
-
-            self.snake.reset()
+            return
 
         self.partial_reset()
         self.update_snake()
@@ -103,16 +102,17 @@ class GeneticGame(Game):
         pygame.event.clear()
 
     def end_epoch(self):
-        self.generation += 1
         self.generate_new_population()
+        self.partial_reset()
         self.new_epoch()
 
     def new_epoch(self):
+        self.generation += 1
         self.current_individual_index = 0
-        self.update_snake()
 
     def update_snake(self):
         self.snake = self.snake_list[self.current_individual_index]
+        self.snake.reset()
         self.player.update(self.current_individual_index, self.food)
 
     def generate_new_population(self):
@@ -122,6 +122,7 @@ class GeneticGame(Game):
             pop_weights.append(self.network_list[net].weights_to_array())
 
         new_pop = self.algorithm.generate_new_population(pop_weights, self.fitness_list)
+        print(np.count_nonzero(self.fitness_list == 0)) #  TODO remove
         self.fitness_list.fill(0)
 
         for net in range(len(self.network_list)):
@@ -163,8 +164,8 @@ class GeneticGame(Game):
 
 
 if __name__ == "__main__":
-    game = GeneticGame(delay=0, hidden_layers=[8, 7], mutation_chance=0.05, fittest_percent=0.1, population_size=50,
-                       crossover_points=3, inputs=5,
-                       moves_to_decrement=1, score_decrement=2, screen_size=20, score_increment=2,
-                       box_width=20, initial_score=100, turn_decrement_factor=1.25, score_decrement_move=1)
+    game = GeneticGame(delay=0, hidden_layers=[4, 4], mutation_chance=0.05, fittest_percent=0.2, population_size=80,
+                       crossover_points=2, inputs=7, food_value=500,
+                       moves_to_decrement=1, score_decrement=3, screen_size=20, score_increment=2,
+                       box_width=20, initial_score=500, turn_decrement_factor=1.25, score_decrement_move=2)
     game.run()
