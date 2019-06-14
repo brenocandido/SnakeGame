@@ -18,32 +18,27 @@ class NeuralNetwork:
         previous_layer_nodes = inputs
         for i in range(self.hidden_layers_number):
             # Generates weights between -1 and 1
-            self.weights.append(np.random.random((hidden_layers[i], previous_layer_nodes))*2 - 1)
+            self.weights.append(np.random.random((previous_layer_nodes, hidden_layers[i]))*2 - 1)
             previous_layer_nodes = hidden_layers[i]
 
         # Appending last layer weights before output
-        self.weights.append(np.random.random((outputs, previous_layer_nodes)))
+        self.weights.append(np.random.random((previous_layer_nodes, outputs)))
 
     def think(self, inputs):
-        assert len(inputs) == len(self.weights[0][0])
+        # assert len(inputs) == len(self.weights[0][0])
 
         x = inputs
         output = inputs
         for i in range(len(self.weights)):
             nodes_w = self.weights[i]
-            output = np.zeros(len(nodes_w))
 
-            for j in range(len(nodes_w)):
-                weights = nodes_w[j]
-
-                # Use softmax if outputting
-                if i == len(self.weights) - 1:
-                    output[j] = self.softmax(self.perceptron(x, weights))
-                # Use sigmoid
-                else:
-                    output[j] = self.sigmoid(self.perceptron(x, weights))
-
-                # output[j] = self.perceptron(x, weights)
+            # Use softmax if outputting
+            if i == len(self.weights) - 1:
+                output = self.softmax(self.perceptron(x, nodes_w))
+            # Use sigmoid
+            else:
+                # output = self.sigmoid(self.perceptron(x, nodes_w))*2 - 1
+                output = np.tanh(self.perceptron(x, nodes_w))
 
             x = output
 
@@ -93,9 +88,9 @@ class NeuralNetwork:
 
 
 def main():
-    x = np.array([102, -204, 70, 10])
+    x = np.array([0.5, 1, -1, -0.5])
 
-    epochs = 1000
+    epochs = 1
 
     net_input = 4
     net_output = 3
@@ -121,6 +116,7 @@ def main():
 
         for net in range(len(nn)):
             out = nn[net].think(x)[0]
+            print(np.argmax(out))
         #     fitness[net] = -(0.1*out**4 + 1*out**3 - 1000*out**2 + 2)
         #     if fitness[net] > max_fitness:
         #         max_fitness = fitness[net]

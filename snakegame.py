@@ -10,7 +10,9 @@ from game_box import Item
 
 
 class Game:
-    def __init__(self, screen_size=20, delay=200, box_width=20, human_player=True, score_tracking=False):
+    def __init__(self, screen_size=20, delay=200, box_width=20, human_player=True,
+                 food_value=200, moves_to_decrement=1, score_decrement=2, score_decrement_move=2,
+                 score_increment=2, initial_score=100, score_tracking=False, turn_decrement_factor=1):
         self.is_running = False
 
         self.__screen_size__ = screen_size
@@ -22,7 +24,10 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.score_tracking = score_tracking
-        self.score = score.Score(food_value=200, moves_to_decrement=1, score_decrement=2, initial_score=1000)
+        self.score = score.Score(food_value=food_value, moves_to_decrement=moves_to_decrement,
+                                 score_decrement=score_decrement, initial_score=initial_score,
+                                 score_increment=score_increment, score_decrement_move=score_decrement_move,
+                                 turn_decrement_factor=turn_decrement_factor)
 
         self.game_box = game_box.GameBox(screen_size)
         self.screen = pygame.display.set_mode([screen_width, screen_width])
@@ -47,6 +52,9 @@ class Game:
         self.total_size = 0
         self.largest_snake = 0
         self.average_size = 0
+
+        # Check if snake turned
+        self.turned = False
 
     def setup_game(self):
         self.snake = self.spawn_snake((self.__screen_size__//2, self.__screen_size__//2), self.game_box)
@@ -102,21 +110,23 @@ class Game:
     def get_player_move(self):
         move = self.player.get_move()
         if not self.is_backwards_move(self.snake.direction, move) and self.snake.is_moving():
+            self.check_turned(move)
             self.snake.turn(move)
+
+        return move
+
+    def check_turned(self, move):
+        if move != self.snake.direction:
+            self.turned = True
+        else:
+            self.turned = False
 
     def move(self):
         if self.snake.is_moving():
-            if self.snake.direction == Direction.up or self.snake.direction == Direction.down:      # Vertical move
-                k = -1 if self.snake.direction == Direction.up else 1       # Inverted because of screen starting point
-                new_position = (self.snake.head().position[0], self.snake.head().position[1] + k)
-                if not self.check_hit(new_position):
-                    self.snake.move_head(new_position)
+            new_position = self.new_position(self.snake.direction)
 
-            else:                                                                        # Horizontal move
-                k = 1 if self.snake.direction == Direction.right else -1
-                new_position = (self.snake.head().position[0] + k, self.snake.head().position[1])
-                if not self.check_hit(new_position):
-                    self.snake.move_head(new_position)
+            if not self.check_hit(new_position):
+                self.snake.move_head(new_position)
 
             if not self.__hit__:
 
@@ -128,9 +138,21 @@ class Game:
             else:
                 self.snake_death()
 
+    def new_position(self, move):
+        if move == Direction.up or move == Direction.down:  # Vertical move
+            k = -1 if move == Direction.up else 1  # Inverted because of screen starting point
+            new_position = (self.snake.head().position[0], self.snake.head().position[1] + k)
+
+        else:  # Horizontal move
+            k = 1 if move == Direction.right else -1
+            new_position = (self.snake.head().position[0] + k, self.snake.head().position[1])
+
+        return new_position
+
     def snake_death(self):
         self.snake.kill()
-        if self.score_tracking: self.score_track()
+        if self.score_tracking:
+            self.score_track()
 
     def eat_food(self):
         self.snake_ate()
@@ -170,16 +192,16 @@ class Game:
 
         return False
 
-    def check_collision(self):
+    def check_collision(self, position):
         for part in self.snake.body:
             if part != self.snake.head():
-                if part.position == self.snake.head().position:
+                if part.position == position:
                     return True
 
         return False
 
     def check_hit(self, position):
-        if self.check_collision() or self.check_wall_hit(position):
+        if self.check_collision(self.snake.head().position) or self.check_wall_hit(position):
             self.__hit__ = True
             return True
 
@@ -197,7 +219,7 @@ class Game:
         self.draw_food()
         self.draw_walls()
         self.draw_snake()
-        self.set_display_caption(str(self.score.score))
+        self.set_display_caption(str(int(self.score.score)))
         pygame.display.update()
 
     @staticmethod
@@ -258,6 +280,7 @@ class Game:
         self.food = self.spawn_food()
         self.score.reset()
         self.player.reset()
+        self.turned = False
 
 
 if __name__ == "__main__":

@@ -23,21 +23,21 @@ class PlayerAIGenetic(PlayerAI):
         directions = [Direction.up, Direction.right, Direction.down, Direction.left]
 
         dir_index = directions.index(self.snake.direction)
-        turn_index = 0
+        index = np.argmax(output)
+        turn_index = index if index != 2 else -1
 
-        if np.array_equal(output, [0, 1, 0]):   # Right
-            turn_index = 1
+        result_index = dir_index + turn_index
 
-        elif np.array_equal(output, [0, 0, 1]):   # Left
-            turn_index = -1
+        # because of array out of bounds
+        result_index = 0 if result_index == 4 else result_index
 
-        return directions[dir_index + turn_index]
+        return directions[result_index]
 
     def get_inputs(self):
         sensors = self.get_sensors_inputs()
         food = self.get_food_inputs()
-        tail = self.get_tail_inputs()
-        return np.concatenate((sensors, food, tail))
+        # tail = self.get_tail_inputs()
+        return np.concatenate((sensors, food))
 
     def get_sensors_inputs(self):
         current_direction_index = 0
@@ -48,8 +48,12 @@ class PlayerAIGenetic(PlayerAI):
         elif self.snake.direction == Direction.left:
             current_direction_index = 3
 
+        # Because of out of bounds array
+        index_right = current_direction_index + 1
+        index_right = 0 if index_right == 4 else index_right
+
         sensor_front = self.sensors[current_direction_index]
-        sensor_right = self.sensors[current_direction_index + 1]
+        sensor_right = self.sensors[index_right]
         sensor_left = self.sensors[current_direction_index - 1]
 
         sensor_front_out = self.__output_normalized__(sensor_front.distance_to_obstacle())
@@ -59,43 +63,68 @@ class PlayerAIGenetic(PlayerAI):
         return np.array([sensor_front_out, sensor_right_out, sensor_left_out])
 
     def get_food_inputs(self):
-        food_x = self.food.position[0]
-        food_y = self.food.position[1]
+        return self.get_inputs_xy(self.food.position)
+
+    # down: -x, y
+    # left: -y, -x
+    # up:   x, -y
+    # right: y, x
+
+    def get_inputs_xy(self, position):
+        x = position[0]
+        y = position[1]
+
         head_x = self.snake.head().position[0]
         head_y = self.snake.head().position[1]
-        food_x_out = self.__output_normalized__(food_x - head_x)
-        food_y_out = self.__output_normalized__(food_y - head_y)
 
-        return np.array([food_x_out, food_y_out])
+        if not self.is_vertical_move():
+            x, y = self.swap(x, y)
+            head_x, head_y = self.swap(head_x, head_y)
+
+        x_out = self.__output_normalized__(x - head_x)
+        y_out = self.__output_normalized__(y - head_y)
+
+        direction = self.snake.direction
+        if direction == Direction.down or direction == Direction.left:
+                x_out = -x_out
+        if direction == Direction.up or direction == Direction.left:
+                y_out = -y_out
+
+        return np.array([x_out, y_out])
+
+    @staticmethod
+    def swap(x, y):
+        return y, x
+
+    def is_vertical_move(self):
+        if self.snake.direction == Direction.up or self.snake.direction == Direction.down:
+            return True
+        return False
+
+    # If the move is opposite to positive moves (up for y, right for x)
+    def is_opposite_move(self):
+        if self.snake.direction == Direction.down or self.snake.direction == Direction.left:
+            return True
+        return False
 
     def get_tail_inputs(self):
-        tail_x = self.snake.tail().position[0]
-        tail_y = self.snake.tail().position[0]
-        head_x = self.snake.head().position[0]
-        head_y = self.snake.head().position[1]
-        tail_x_out = self.__output_normalized__(tail_x - head_x)
-        tail_y_out = self.__output_normalized__(tail_y - head_y)
-
-        return np.array([tail_x_out, tail_y_out])
+        return self.get_inputs_xy(self.snake.tail().position)
 
     def __output_normalized__(self, output):
         # For object right in front of snake, output must be one
-        if output == 0:
-            output = 1      # In case tail_x == head_x for example
 
-        if output < 0:
-            normal_out = -(self.box.size() - (-output - 1)) / self.box.size()
-        else:
-            normal_out = (self.box.size() - (output - 1)) / self.box.size()
+        # if output < 0:
+        #     normal_out = -(self.box.size() - (-output)) / self.box.size()
+        # else:
+        #     normal_out = (self.box.size() - (output - 1)) / self.box.size()
+        normal_out = output/self.box.size()
 
         return normal_out
 
-    #  (2 - (-1 + 1))/2
-
-
-    def update(self, individual_index):
+    def update(self, individual_index, food):
         self.snake = self.snake_list[individual_index]
         self.network = self.network_list[individual_index]
+        self.update_food(food)
 
         for sensor in self.sensors:
             sensor.update_snake(self.snake)

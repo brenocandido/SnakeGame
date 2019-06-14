@@ -57,6 +57,22 @@ class Sensor:
 
         return current_position
 
+    def get_food_position(self):
+        current_position = self.snake.head().position
+
+        for i in range(self.sensor_range):
+            distance = i + 1
+            next_position = self.get_next_position(current_position, distance)
+
+            if self.game_box.is_in_box(next_position):
+                if self.game_box.item(next_position) == Item.food:
+                    return next_position
+
+            else:
+                return next_position
+
+        return current_position
+
     def get_object_type(self):
         object_position = self.get_object_position()
 
