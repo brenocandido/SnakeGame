@@ -1,6 +1,7 @@
 from player_ai import PlayerAI
 from sensor import Sensor
 from snakegame import Direction
+from sensor import Item
 import numpy as np
 
 
@@ -15,8 +16,14 @@ class PlayerAIGenetic(PlayerAI):
 
         self.network = self.network_list[0]
 
-        self.sensors = [Sensor(Direction.up, self.snake, self.box), Sensor(Direction.right, self.snake, self.box),
-                        Sensor(Direction.down, self.snake, self.box), Sensor(Direction.left, self.snake, self.box)]
+        self.sensors = [Sensor(Direction.up, self.snake, self.box),
+                        Sensor(Direction.up_right, self.snake, self.box),
+                        Sensor(Direction.right, self.snake, self.box),
+                        Sensor(Direction.down_right, self.snake, self.box),
+                        Sensor(Direction.down, self.snake, self.box),
+                        Sensor(Direction.down_left, self.snake, self.box),
+                        Sensor(Direction.left, self.snake, self.box),
+                        Sensor(Direction.up_left, self.snake, self.box)]
 
     def get_move(self):
         output = self.network.think(self.get_inputs())
@@ -43,25 +50,26 @@ class PlayerAIGenetic(PlayerAI):
     def get_sensors_inputs(self):
         current_direction_index = 0
         if self.snake.direction == Direction.right:
-            current_direction_index = 1
-        elif self.snake.direction == Direction.down:
             current_direction_index = 2
+        elif self.snake.direction == Direction.down:
+            current_direction_index = 4
         elif self.snake.direction == Direction.left:
-            current_direction_index = 3
+            current_direction_index = 6
 
-        # Because of out of bounds array
-        index_right = current_direction_index + 1
-        index_right = 0 if index_right == 4 else index_right
+        n_sensors = len(self.sensors)
+        sensor_input_body = []
+        sensor_input_wall = []
 
-        sensor_front = self.sensors[current_direction_index]
-        sensor_right = self.sensors[index_right]
-        sensor_left = self.sensors[current_direction_index - 1]
+        for i in range(n_sensors):
+            index = (current_direction_index + i) % n_sensors
+            sensor = self.sensors[index]
 
-        sensor_front_out = self.__output_normalized__(sensor_front.distance_to_obstacle())
-        sensor_right_out = self.__output_normalized__(sensor_right.distance_to_obstacle())
-        sensor_left_out = self.__output_normalized__(sensor_left.distance_to_obstacle())
+            # If not sensor to the back of the snake
+            if i != 4:
+                sensor_input_body.append(self.__output_normalized__(sensor.distance_to_item(Item.body)))
+                sensor_input_wall.append(self.__output_normalized__(sensor.distance_to_item(Item.wall)))
 
-        return np.array([sensor_front_out, sensor_right_out, sensor_left_out])
+        return np.concatenate((sensor_input_wall, sensor_input_body))
 
     def get_food_inputs(self):
         return self.get_inputs_xy(self.food.position)

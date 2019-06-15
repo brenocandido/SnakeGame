@@ -41,6 +41,31 @@ class Sensor:
 
         return current_position
 
+    def distance_to_item(self, item):
+        current_position = self.snake.head().position
+        item_position = self.get_item_position(item)
+
+        if not self.game_box.is_in_box(item_position):
+            return self.game_box.size()
+        else:
+            return abs(current_position[0] - item_position[0]) + abs(current_position[1] - item_position[1])
+
+    def get_item_position(self, item):
+        current_position = self.snake.head().position
+
+        for i in range(self.sensor_range):
+            distance = i + 1
+            next_position = self.get_next_position(current_position, distance)
+
+            if self.game_box.is_in_box(next_position):
+                if self.game_box.item(next_position) == item:
+                    return next_position
+
+            else:
+                return next_position
+
+        return current_position
+
     def get_obstacle_position(self):
         current_position = self.snake.head().position
 
@@ -58,20 +83,8 @@ class Sensor:
         return current_position
 
     def get_food_position(self):
-        current_position = self.snake.head().position
-
-        for i in range(self.sensor_range):
-            distance = i + 1
-            next_position = self.get_next_position(current_position, distance)
-
-            if self.game_box.is_in_box(next_position):
-                if self.game_box.item(next_position) == Item.food:
-                    return next_position
-
-            else:
-                return next_position
-
-        return current_position
+        position = self.get_item_position(Item.food)
+        return position
 
     def get_object_type(self):
         object_position = self.get_object_position()

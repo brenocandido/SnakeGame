@@ -1,4 +1,6 @@
 
+import numpy as np
+
 class Score:
 
     def __init__(self, food_value=200, moves_to_decrement=2, score_decrement=1, score_decrement_move = 1,
@@ -109,11 +111,11 @@ class Score:
 
     def get_final_score(self):
 
-        final_score = 0.5*self.get_moves_to_food()*(self.score*(self.move_count*0.1)*self.times_ate_food)\
-                      + (self.times_ate_food**2)*self.food_value
-
-        if final_score < 0:
-            final_score = 0
+        # starter_score = 0.1*self.get_moves_to_food()*(self.score*(self.move_count*0.1)*self.times_ate_food)
+        # starter_score = np.maximum(0, starter_score)
+        # final_score = 3*self.food_value*(1 - np.exp(-starter_score)) + (self.times_ate_food**2)*self.food_value
+        final_score = 0.1*self.score*self.get_moves_to_food() + 2**self.times_ate_food*self.food_value
+        final_score = np.maximum(0, final_score)
 
         penalty = self.killed_itself_penalty if self.killed_itself else 1
         return final_score * penalty

@@ -5,6 +5,7 @@ from neural_network import NeuralNetwork
 from player_ai_genetic import PlayerAIGenetic
 import numpy as np
 import pygame
+from mem_top import mem_top
 
 SPEED_FAST = 0
 SPEED_MEDIUM = 10
@@ -121,6 +122,10 @@ class GeneticGame(Game):
         self.generate_new_population()
         self.generation_reset()
         self.new_epoch()
+        # TODO remove
+        # print("\n")
+        # print(mem_top())
+        # print("\n")
 
     def generation_reset(self):
         self.partial_reset()
@@ -193,8 +198,8 @@ class GeneticGame(Game):
 
 
 if __name__ == "__main__":
-    game = GeneticGame(delay=0, hidden_layers=[4, 4], mutation_chance=0.05, fittest_percent=0.5, population_size=80,
-                       crossover_points=3, inputs=7, food_value=1000,
-                       moves_to_decrement=1, score_decrement=3, screen_size=20, score_increment=2,
-                       box_width=20, initial_score=500, turn_decrement_factor=1.2, score_decrement_move=4)
+    game = GeneticGame(delay=0, hidden_layers=[10], mutation_chance=0.01, fittest_percent=0.5, population_size=80,
+                       crossover_points=3, inputs=18, food_value=100,
+                       moves_to_decrement=1, score_decrement=0.3, screen_size=20, score_increment=0.2,
+                       box_width=20, initial_score=100, turn_decrement_factor=1.5, score_decrement_move=0.4)
     game.run()
