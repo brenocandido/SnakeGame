@@ -6,6 +6,11 @@ from player_ai_genetic import PlayerAIGenetic
 import numpy as np
 import pygame
 
+SPEED_FAST = 0
+SPEED_MEDIUM = 10
+SPEED_SLOW = 20
+SPEED_EXTRA_SLOW = 50
+
 
 class GeneticGame(Game):
 
@@ -80,7 +85,7 @@ class GeneticGame(Game):
 
         self.current_individual_index += 1
         if self.current_individual_index == self.population_size:
-            print("Generation " + str(self.generation) + " finished")
+            print("> Generation [" + str(self.generation) + "] finished")
             self.end_epoch()
             return
 
@@ -98,6 +103,15 @@ class GeneticGame(Game):
             self.__delay__ -= 10
             if self.__delay__ < 0:
                 self.__delay__ = 0
+
+        elif keys[pygame.K_1]:
+            self.__delay__ = SPEED_FAST
+        elif keys[pygame.K_2]:
+            self.__delay__ = SPEED_MEDIUM
+        elif keys[pygame.K_3]:
+            self.__delay__ = SPEED_SLOW
+        elif keys[pygame.K_4]:
+            self.__delay__ = SPEED_EXTRA_SLOW
 
         pygame.event.clear()
 
@@ -122,7 +136,8 @@ class GeneticGame(Game):
             pop_weights.append(self.network_list[net].weights_to_array())
 
         new_pop = self.algorithm.generate_new_population(pop_weights, self.fitness_list)
-        print(np.count_nonzero(self.fitness_list == 0)) #  TODO remove
+        print("Zero fitness: " + str(np.count_nonzero(self.fitness_list == 0))) #  TODO remove or add somewhere else
+        print("Fitness mean: " + str(np.mean(self.fitness_list)))
         self.fitness_list.fill(0)
 
         for net in range(len(self.network_list)):
@@ -145,6 +160,9 @@ class GeneticGame(Game):
             return True
         return False
 
+    def display_score(self):
+        self.set_display_caption(str(int(self.score.get_final_score())))
+
     @staticmethod
     def manhattan(start, end):
         return abs(end[0] - start[0]) + abs(end[1] - start[1])
@@ -164,8 +182,8 @@ class GeneticGame(Game):
 
 
 if __name__ == "__main__":
-    game = GeneticGame(delay=0, hidden_layers=[4, 4], mutation_chance=0.05, fittest_percent=0.2, population_size=80,
+    game = GeneticGame(delay=0, hidden_layers=[4, 4], mutation_chance=0.01, fittest_percent=0.5, population_size=80,
                        crossover_points=2, inputs=7, food_value=500,
                        moves_to_decrement=1, score_decrement=3, screen_size=20, score_increment=2,
-                       box_width=20, initial_score=500, turn_decrement_factor=1.25, score_decrement_move=2)
+                       box_width=20, initial_score=500, turn_decrement_factor=1.1, score_decrement_move=2)
     game.run()

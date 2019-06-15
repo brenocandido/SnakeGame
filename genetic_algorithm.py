@@ -67,7 +67,7 @@ class GeneticAlgorithm:
             max_fitness_index = np.where(fitness_copy == np.amax(fitness_copy))[0][0]
 
             fittest[i] = population[max_fitness_index]
-            fitness_copy[max_fitness_index] = -99999999
+            fitness_copy[max_fitness_index] = -np.inf
 
         return fittest
 

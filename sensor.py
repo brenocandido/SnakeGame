@@ -84,19 +84,50 @@ class Sensor:
 
     def get_next_position(self, current_position, distance):
 
-        if self.direction == Direction.up:
+        direction = self.direction
+        secondary_direction = self.get_secondary_direction(direction)      # for diagonal
+
+        if self.is_diagonal_up(direction):
+            direction = Direction.up
+        elif self.is_diagonal_down(direction):
+            direction = Direction.down
+
+        if direction == Direction.up:
             return current_position[0], current_position[1] - distance
 
-        elif self.direction == Direction.down:
+        elif direction == Direction.down:
             return current_position[0], current_position[1] + distance
 
-        elif self.direction == Direction.left:
+        elif direction == Direction.left:
             return current_position[0] - distance, current_position[1]
 
-        elif self.direction == Direction.right:
+        elif direction == Direction.right:
             return current_position[0] + distance, current_position[1]
+
+        if secondary_direction is not None:
+            self.get_next_position(secondary_direction, distance)
+
+    # For diagonal sensors
+    def get_secondary_direction(self, direction):
+        if not self.is_diagonal_direction():
+            return None
+
+        if direction == Direction.down_left or Direction.up_left:
+            return Direction.left
+
         else:
-            raise Exception("Sensor direction not specified")
+            return Direction.right
+
+    def is_diagonal_direction(self, direction):
+        return self.is_diagonal_up(direction) or self.is_diagonal_down(direction)
+
+    @staticmethod
+    def is_diagonal_up(direction):
+        return direction == Direction.up_right or direction == Direction.up_left
+
+    @staticmethod
+    def is_diagonal_down(direction):
+        return direction == Direction.down_right or direction == Direction.down_left
 
     def update_snake(self, snake):
         self.snake = snake

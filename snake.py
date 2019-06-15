@@ -8,6 +8,10 @@ class Direction(Enum):
     right = -2
     down = 1
     left = 2
+    up_right = -3
+    up_left = 3
+    down_right = -4
+    down_left = 4
     none = 0
 
 

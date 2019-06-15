@@ -21,6 +21,9 @@ class Score:
         self.average_score = 0
         self.total_games = 0
 
+        self.killed_itself = False
+        self.killed_itself_penalty = 0.8
+
         self.current_high_score = 0
 
     def reset(self):
@@ -29,6 +32,7 @@ class Score:
         self.eat_flag = False
         self.current_high_score = 0
         self.times_ate_food = 0
+        self.killed_itself = False
 
     def move_increment(self):
         self.move_count += 1
@@ -72,10 +76,10 @@ class Score:
             self.high_score = self.score
 
     def ate_itself(self):
-        self.score_subtract(100)
+        self.killed_itself = True
 
     def hit_wall(self):
-        self.score_subtract(100)
+        self.killed_itself = True
 
     def score_subtract(self, amount):
         self.score -= amount
@@ -87,7 +91,10 @@ class Score:
         self.average_score = self.total_score//self.total_games
 
     def get_final_score(self):
-        return self.score*(self.move_count*0.1) + self.times_ate_food*self.food_value
+        final_score = self.score*(self.move_count*0.1)*((self.times_ate_food - 1)**2) + \
+                      (self.times_ate_food**3)*self.food_value
+        penalty = self.killed_itself_penalty if self.killed_itself else 1
+        return final_score * penalty
 
     def refresh(self, turned=False):
         self.move_increment()

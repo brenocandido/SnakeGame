@@ -59,7 +59,7 @@ class Game:
     def setup_game(self):
         self.snake = self.spawn_snake((self.__screen_size__//2, self.__screen_size__//2), self.game_box)
         self.food = self.spawn_food()
-        self.player = Player() if self.human_player else PlayerAIAStar(self.snake, self.food, self.score,
+        self.player = Player() if self.human_player else PlayerAIAStar(self.snake, self.food,
                                                                        self.game_box, self.walls_list)
 
     @staticmethod
@@ -219,8 +219,11 @@ class Game:
         self.draw_food()
         self.draw_walls()
         self.draw_snake()
-        self.set_display_caption(str(int(self.score.score)))
+        self.display_score()
         pygame.display.update()
+
+    def display_score(self):
+        self.set_display_caption(str(int(self.score.score)))
 
     @staticmethod
     def set_display_caption(caption):
@@ -284,5 +287,5 @@ class Game:
 
 
 if __name__ == "__main__":
-    game = Game(screen_size=50, box_width=10, delay=0, human_player=False, score_tracking=True)
+    game = Game(screen_size=20, box_width=20, delay=0, human_player=False, score_tracking=True)
     game.run()
