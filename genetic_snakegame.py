@@ -66,9 +66,9 @@ class GeneticGame(Game):
 
     def check_penalties(self, move):
         if self.is_move_towards_food(move):
-            self.score.score_increment()
+            self.score.move_towards_food()
         else:
-            self.score.score_decrement()
+            self.score.move_away_from_food()
 
         if self.check_collision(self.new_position(move)):
             self.score.ate_itself()
@@ -82,10 +82,11 @@ class GeneticGame(Game):
 
     def next_individual(self):
         self.get_fitness()
+        self.get_largest_snake()
+        self.score.check_spinner()
 
         self.current_individual_index += 1
         if self.current_individual_index == self.population_size:
-            print("> Generation [" + str(self.generation) + "] finished")
             self.end_epoch()
             return
 
@@ -116,13 +117,20 @@ class GeneticGame(Game):
         pygame.event.clear()
 
     def end_epoch(self):
+        self.stats()
         self.generate_new_population()
-        self.partial_reset()
+        self.generation_reset()
         self.new_epoch()
+
+    def generation_reset(self):
+        self.partial_reset()
+        self.score.trackers_reset()
+        self.largest_snake = 0
 
     def new_epoch(self):
         self.generation += 1
         self.current_individual_index = 0
+        self.fitness_list.fill(0)
 
     def update_snake(self):
         self.snake = self.snake_list[self.current_individual_index]
@@ -136,12 +144,15 @@ class GeneticGame(Game):
             pop_weights.append(self.network_list[net].weights_to_array())
 
         new_pop = self.algorithm.generate_new_population(pop_weights, self.fitness_list)
-        print("Zero fitness: " + str(np.count_nonzero(self.fitness_list == 0))) #  TODO remove or add somewhere else
-        print("Fitness mean: " + str(np.mean(self.fitness_list)))
-        self.fitness_list.fill(0)
 
         for net in range(len(self.network_list)):
             self.network_list[net].array_to_weights(new_pop[net])
+
+    def stats(self):
+        print("> Generation [" + str(self.generation) + "] finished")
+        print("Spinners: " + str(self.score.spinners))
+        print("Fitness mean: " + str(np.mean(self.fitness_list)))
+        print("Generation largest snake: " + str(self.largest_snake))
 
     def setup_game(self):
         for i in range(self.population_size):
@@ -182,8 +193,8 @@ class GeneticGame(Game):
 
 
 if __name__ == "__main__":
-    game = GeneticGame(delay=0, hidden_layers=[4, 4], mutation_chance=0.01, fittest_percent=0.5, population_size=80,
-                       crossover_points=2, inputs=7, food_value=500,
+    game = GeneticGame(delay=0, hidden_layers=[4, 4], mutation_chance=0.05, fittest_percent=0.5, population_size=80,
+                       crossover_points=3, inputs=7, food_value=1000,
                        moves_to_decrement=1, score_decrement=3, screen_size=20, score_increment=2,
-                       box_width=20, initial_score=500, turn_decrement_factor=1.1, score_decrement_move=2)
+                       box_width=20, initial_score=500, turn_decrement_factor=1.2, score_decrement_move=4)
     game.run()

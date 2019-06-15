@@ -109,7 +109,7 @@ class Sensor:
 
     # For diagonal sensors
     def get_secondary_direction(self, direction):
-        if not self.is_diagonal_direction():
+        if not self.is_diagonal_direction(direction):
             return None
 
         if direction == Direction.down_left or Direction.up_left:

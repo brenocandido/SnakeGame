@@ -21,14 +21,14 @@ class GeneticAlgorithm:
 
         population_size = len(population)
         genome_size = len(population[0])
-        fittest = self.select_fittest(population, fitness)
+        fittest, fittest_fitness = self.select_fittest(population, fitness)
 
         # Number of children created
         offspring_size = population_size - len(fittest)
         offspring = np.empty(offspring_size*genome_size).reshape(offspring_size, genome_size)
 
         for i in range(offspring_size):
-            parents = self.select_parents(fittest)
+            parents = self.select_parents(fittest, fittest_fitness)
 
             # Executes crossover and mutates
             offspring[i] = self.mutate(self.crossover(*parents))
@@ -37,18 +37,29 @@ class GeneticAlgorithm:
 
         return new_population
 
+    # Fittest proportionate
     @staticmethod
-    def select_parents(fittest):
-        fittest_indexes = list(range(len(fittest)))
+    def select_parents(fittest, fitness):
+        pop_size = len(fittest)
         genome_size = len(fittest[0])
+
+        fitness_copy = np.copy(fitness)
 
         parents = np.empty(2*genome_size).reshape(2, genome_size)
 
-        for i in range(2):
-            parent_index = np.random.choice(fittest_indexes)
-            fittest_indexes.remove(parent_index)
+        for parent in range(2):
+            fitness_sum = np.sum(fitness_copy)
+            choice = np.random.rand() * fitness_sum
+            current_sum = 0
 
-            parents[i] = fittest[parent_index]
+            for i in range(pop_size):
+
+                current_sum += fitness_copy[i]
+
+                if choice < current_sum:
+                    parents[parent] = fittest[i]
+                    fitness_copy[i] = 0
+                    break
 
         return parents
 
@@ -61,15 +72,17 @@ class GeneticAlgorithm:
         fitness_copy = np.copy(fitness)
 
         fittest = np.empty(fittest_size*genome_size).reshape(fittest_size, genome_size)
+        fittest_fitness = np.empty(fittest_size)
 
         for i in range(fittest_size):
             # Gets the index of the maximum fitness
             max_fitness_index = np.where(fitness_copy == np.amax(fitness_copy))[0][0]
 
             fittest[i] = population[max_fitness_index]
+            fittest_fitness[i] = fitness[max_fitness_index]
             fitness_copy[max_fitness_index] = -np.inf
 
-        return fittest
+        return fittest, fittest_fitness
 
     def mutate(self, genome):
 
