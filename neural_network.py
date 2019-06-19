@@ -22,7 +22,7 @@ class NeuralNetwork:
             previous_layer_nodes = hidden_layers[i]
 
         # Appending last layer weights before output
-        self.weights.append(np.random.random((previous_layer_nodes, outputs)))
+        self.weights.append((np.random.random((previous_layer_nodes, outputs))*2 - 1)*100)
 
     def think(self, inputs):
         # assert len(inputs) == len(self.weights[0][0])

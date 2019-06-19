@@ -91,7 +91,7 @@ class GeneticAlgorithm:
         for gene in range(len(genome)):
 
             # Choose genes to mutate based on mutation chance
-            choice = np.random.random()
+            choice = np.random.rand()
             if self.mutation_chance >= choice:
 
                 mutated_gene = (np.random.rand() * 2 - 1)*100
@@ -106,7 +106,7 @@ class GeneticAlgorithm:
 
         # Distance between each crossover point
         crossover_delta = int(np.floor(len(genome_a)/(self.crossover_points + 1)))
-        crossover_delta = 1 if crossover_delta > 1 else crossover_delta
+        crossover_delta = 1 if crossover_delta < 1 else crossover_delta
 
         crossover_genome = genome_a
 

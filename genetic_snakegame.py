@@ -157,6 +157,7 @@ class GeneticGame(Game):
         print("> Generation [" + str(self.generation) + "] finished")
         print("Spinners: " + str(self.score.spinners))
         print("Fitness mean: " + str(np.mean(self.fitness_list)))
+        print("Max fitness: " + str(np.max(self.fitness_list)))
         print("Generation largest snake: " + str(self.largest_snake))
 
     def setup_game(self):
@@ -198,8 +199,8 @@ class GeneticGame(Game):
 
 
 if __name__ == "__main__":
-    game = GeneticGame(delay=0, hidden_layers=[10], mutation_chance=0.01, fittest_percent=0.5, population_size=80,
-                       crossover_points=3, inputs=18, food_value=100,
-                       moves_to_decrement=1, score_decrement=0.3, screen_size=20, score_increment=0.2,
-                       box_width=20, initial_score=100, turn_decrement_factor=1.5, score_decrement_move=0.4)
+    game = GeneticGame(delay=0, hidden_layers=[7, 5], mutation_chance=0.02, fittest_percent=0.5, population_size=80,
+                       crossover_points=3, inputs=11, food_value=500,
+                       moves_to_decrement=1, score_decrement=2, screen_size=30, score_increment=1,
+                       box_width=20, initial_score=200, turn_decrement_factor=1, score_decrement_move=2)
     game.run()

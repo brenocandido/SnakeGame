@@ -1,3 +1,5 @@
 __pycache__/
 venv/
 .idea/
+snake_data.dat
+data_read.py

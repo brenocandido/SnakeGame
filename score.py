@@ -50,11 +50,11 @@ class Score:
         self.move_count += 1
 
     def move_towards_food(self):
-        # self.score += self.score_increment_step
+        self.score += self.score_increment_step
         self.times_moved_towards_food += 1
 
     def move_away_from_food(self):
-        # self.score_subtract(self.score_decrement_step)
+        self.score_subtract(self.score_decrement_step)
         self.times_moved_away_from_food += 1
 
     def check_decrement(self, turned=False):
@@ -111,10 +111,9 @@ class Score:
 
     def get_final_score(self):
 
-        # starter_score = 0.1*self.get_moves_to_food()*(self.score*(self.move_count*0.1)*self.times_ate_food)
-        # starter_score = np.maximum(0, starter_score)
-        # final_score = 3*self.food_value*(1 - np.exp(-starter_score)) + (self.times_ate_food**2)*self.food_value
-        final_score = 0.1*self.score*self.get_moves_to_food() + 2**self.times_ate_food*self.food_value
+        # final_score = 0.01*self.score*self.move_count \
+        #               + (self.times_ate_food**2)*self.food_value
+        final_score = self.times_ate_food**2 * self.move_count * 0.01
         final_score = np.maximum(0, final_score)
 
         penalty = self.killed_itself_penalty if self.killed_itself else 1

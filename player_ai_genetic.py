@@ -69,7 +69,8 @@ class PlayerAIGenetic(PlayerAI):
                 sensor_input_body.append(self.__output_normalized__(sensor.distance_to_item(Item.body)))
                 sensor_input_wall.append(self.__output_normalized__(sensor.distance_to_item(Item.wall)))
 
-        return np.concatenate((sensor_input_wall, sensor_input_body))
+        # return np.concatenate((sensor_input_wall, sensor_input_body))
+        return sensor_input_wall
 
     def get_food_inputs(self):
         return self.get_inputs_xy(self.food.position)
