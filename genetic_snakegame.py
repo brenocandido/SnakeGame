@@ -5,7 +5,6 @@ from neural_network import NeuralNetwork
 from player_ai_genetic import PlayerAIGenetic
 import numpy as np
 import pygame
-from mem_top import mem_top
 
 SPEED_FAST = 0
 SPEED_MEDIUM = 10
@@ -20,7 +19,8 @@ class GeneticGame(Game):
                  population_size = 20, fittest_percent=0.2, mutation_chance=0.05, crossover_points=1,
                  screen_size=20, delay=200, box_width=20,
                  food_value=200, moves_to_decrement=1, score_decrement=2, score_increment=2,
-                 score_decrement_move=2, turn_decrement_factor=1.5, initial_score=100, score_tracking=False):
+                 score_decrement_move=2, turn_decrement_factor=1.5, initial_score=100, score_tracking=False,
+                 save_to_file=False):
 
         self.population_size = population_size
         self.generation = 0
@@ -30,6 +30,11 @@ class GeneticGame(Game):
         self.snake_list = []
         self.network_list = []
         self.fitness_list = np.zeros(self.population_size)
+
+        # Recording best snake
+        self.max_fitness = -np.inf
+        self.max_fitness_network = None
+        self.save_to_file = save_to_file
 
         self.algorithm = GeneticAlgorithm(fittest_percent, mutation_chance, crossover_points)
         for i in range(self.population_size):
@@ -119,13 +124,23 @@ class GeneticGame(Game):
 
     def end_epoch(self):
         self.stats()
+        self.save_best_snake()
         self.generate_new_population()
         self.generation_reset()
         self.new_epoch()
-        # TODO remove
-        # print("\n")
-        # print(mem_top())
-        # print("\n")
+
+    def save_best_snake(self):
+        if np.max(self.fitness_list) > self.max_fitness:
+            max_fitness_index = np.where(self.fitness_list == np.amax(self.fitness_list))[0][0]
+
+            self.max_fitness = np.max(self.fitness_list)
+            self.max_fitness_network = self.network_list[max_fitness_index].weights_to_array()
+
+            if self.save_to_file:
+                f = open("best_snake_weights.dat", "w")
+                f.write("Generation: [" + str(self.generation) + "]\n")
+                f.write(str(self.max_fitness_network))
+                f.close()
 
     def generation_reset(self):
         self.partial_reset()
@@ -196,11 +211,13 @@ class GeneticGame(Game):
         self.snake_list.clear()
         self.network_list.clear()
         self.snake = self.snake_list[0]
+        self.max_fitness = -np.inf
 
 
 if __name__ == "__main__":
     game = GeneticGame(delay=0, hidden_layers=[7, 5], mutation_chance=0.02, fittest_percent=0.5, population_size=80,
                        crossover_points=3, inputs=11, food_value=500,
                        moves_to_decrement=1, score_decrement=2, screen_size=30, score_increment=1,
-                       box_width=20, initial_score=200, turn_decrement_factor=1, score_decrement_move=2)
+                       box_width=20, initial_score=200, turn_decrement_factor=1, score_decrement_move=2,
+                       save_to_file=True)
     game.run()
