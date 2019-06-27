@@ -3,3 +3,4 @@ venv/
 .idea/
 snake_data.dat
 data_read.py
+best_snake_weights.dat
