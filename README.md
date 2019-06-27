@@ -9,6 +9,7 @@ The code got a little crowded as it evolved, so don't mind it.
 
 To play normally, run snakegame.py. It's parameters are at the end of the file. Increase the delay if it's too fast.
 To use A*, set the human_player flag in snakegame.py to false. It's slow when the game board is too big.
+The A* algorithm is almost generic, as it's still required to know the SnakeGame board.
 
 For the Neural Network, run genetic_snakegame.py. The parameters are at the end of the file.
 Fitness is calculated in score.py, in the get_final_score method. Be aware that the score isn't necessarily the final fitness, and it can also be decremented and incremented based on snake movement. That was a choice to make learning faster.
